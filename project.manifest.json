@@ -1,0 +1,40 @@
+{
+  "project_id": "newslayer",
+  "name": "Newslayer",
+  "status": "docs_first",
+  "thesis": "Agent-native crypto news layer with a human workspace on top.",
+  "current_scope": {
+    "category": "crypto",
+    "ui": "human workspace",
+    "canonical_truth": "typed_json",
+    "agent_surfaces": ["markdown", "llms.txt", "rest_json"],
+    "non_goals": [
+      "broad scraping-first ingestion",
+      "full text storage by default",
+      "multi-category expansion before crypto stability",
+      "mcp_in_v0"
+    ]
+  },
+  "core_objects": ["article", "event", "entity", "digest"],
+  "truth_boundary": {
+    "schema": "docs/contracts/event.schema.json",
+    "api": "docs/contracts/openapi.yaml",
+    "policy": "docs/policies/source-rights.md"
+  },
+  "principles": [
+    "events_over_articles",
+    "json_before_markdown",
+    "provenance_required",
+    "rights_aware_output",
+    "human_ui_over_shared_core",
+    "narrow_v0_scope"
+  ],
+  "docs": {
+    "readme": "README.md",
+    "manifesto": "manifesto.md",
+    "llms": "llms.txt",
+    "foundation_plan": "docs/plans/2026-03-06-newslayer-v0-foundation.md",
+    "research": "docs/research/2026-03-06-agent-native-news-landscape.md"
+  }
+}
+

@@ -1,0 +1,198 @@
+openapi: 3.1.0
+info:
+  title: Newslayer API
+  version: 0.1.0
+  summary: Agent-native crypto news API
+  description: |
+    v0 API outline for Newslayer.
+
+    Canonical truth lives in typed JSON records.
+    Human UI and Markdown projections are built on top of the same event layer.
+servers:
+  - url: https://api.newslayer.local
+paths:
+  /v1/events:
+    get:
+      operationId: listEvents
+      summary: List events
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+            enum: [crypto]
+        - name: asset
+          in: query
+          schema:
+            type: string
+        - name: topic
+          in: query
+          schema:
+            type: string
+        - name: event_type
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: since
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: cursor
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        "200":
+          description: Event list
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items, next_cursor]
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Event"
+                  next_cursor:
+                    type: string
+                    nullable: true
+  /v1/events/{event_id}:
+    get:
+      operationId: getEvent
+      summary: Get one event
+      parameters:
+        - name: event_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Event record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+        "404":
+          description: Event not found
+  /v1/digests/{scope}/{window}:
+    get:
+      operationId: getDigest
+      summary: Get digest metadata
+      parameters:
+        - name: scope
+          in: path
+          required: true
+          schema:
+            type: string
+            examples: [crypto, btc, policy]
+        - name: window
+          in: path
+          required: true
+          schema:
+            type: string
+            examples: [24h, 7d, 30d]
+      responses:
+        "200":
+          description: Digest metadata and links
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [scope, window, markdown_url, event_count]
+                properties:
+                  scope:
+                    type: string
+                  window:
+                    type: string
+                  markdown_url:
+                    type: string
+                  event_count:
+                    type: integer
+                  generated_at:
+                    type: string
+                    format: date-time
+components:
+  schemas:
+    Event:
+      type: object
+      description: See docs/contracts/event.schema.json for canonical detail.
+      required:
+        - event_id
+        - category
+        - status
+        - event_type
+        - title
+        - summary_1l
+        - published_at
+        - updated_at
+        - first_seen_at
+        - last_verified_at
+        - importance_score
+        - confidence_score
+        - source_cluster_size
+        - supporting_articles
+        - rights
+      properties:
+        event_id:
+          type: string
+        category:
+          type: string
+        status:
+          type: string
+        event_type:
+          type: string
+        title:
+          type: string
+        summary_1l:
+          type: string
+        summary_5l:
+          type: array
+          items:
+            type: string
+        assets:
+          type: array
+          items:
+            type: string
+        topics:
+          type: array
+          items:
+            type: string
+        published_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        first_seen_at:
+          type: string
+          format: date-time
+        last_verified_at:
+          type: string
+          format: date-time
+        importance_score:
+          type: number
+        confidence_score:
+          type: number
+        source_cluster_size:
+          type: integer
+        supporting_articles:
+          type: array
+          items:
+            type: object
+        rights:
+          type: object
+

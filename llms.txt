@@ -1,0 +1,31 @@
+# Newslayer
+
+> Agent-native crypto news layer with a human workspace on top.
+
+Newslayer is a docs-first project for a crypto news system that models articles, events, entities, and digests. The system is designed for both human operators and AI agents. Canonical truth lives in typed JSON records. Markdown is used for reading surfaces and agent handoff.
+
+Key themes: crypto news, event clustering, provenance, rights-aware ingestion, agent-native delivery, JSON contracts, Markdown digests, llms.txt, MCP-ready design.
+
+## Start Here
+
+- [README](README.md): Project overview, thesis, and current scope.
+- [Manifesto](manifesto.md): Core principles and claim boundary.
+- [Foundation Plan](docs/plans/2026-03-06-newslayer-v0-foundation.md): What v0 is, why it exists, and what it must ship first.
+
+## Contracts
+
+- [Event Schema](docs/contracts/event.schema.json): Canonical event record shape.
+- [OpenAPI](docs/contracts/openapi.yaml): Public API boundary for v0.
+
+## Policy
+
+- [Source Rights Policy](docs/policies/source-rights.md): Default rules for ingestion, storage, excerpts, and source review.
+
+## Docs Index
+
+- [Docs README](docs/README.md): Map of plans, policies, contracts, and research.
+
+## Research
+
+- [Agent-Native News Landscape](docs/research/2026-03-06-agent-native-news-landscape.md): External patterns and adjacent systems that justify the architecture.
+
