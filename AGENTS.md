@@ -20,9 +20,11 @@
 
 - `docs/contracts/event.schema.json` defines the canonical event shape.
 - `docs/contracts/cli.md` defines the primary local access surface for agents.
+- `docs/contracts/source-registry.seed.json` defines the approved v0 source set.
 - `docs/contracts/openapi.yaml` defines the future remote API boundary.
 - `docs/policies/source-rights.md` defines default rights and ingestion behavior.
 - `docs/plans/2026-03-06-sift-v0-foundation.md` defines current product scope and v0 boundary.
+- `docs/plans/2026-03-06-sift-v0-execution-spec.md` defines the concrete v0 implementation decisions.
 
 ## Non-Goals For v0
 

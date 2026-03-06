@@ -48,6 +48,53 @@ Every retrieval command should support:
 
 `json` is the default for agent use.
 
+## Time and filter semantics
+
+- `--since` accepts relative windows like `24h`, `72h`, `7d` or an RFC3339 timestamp.
+- `--until` accepts RFC3339 timestamps.
+- `--limit` defaults to `20` and must cap at `100`.
+- `--asset`, `--topic`, `--event-type`, and `--status` are repeatable filters.
+
+## JSON result envelopes
+
+### List commands
+
+Commands like `sift latest` and `sift search` should return:
+
+```json
+{
+  "items": [],
+  "next_cursor": null,
+  "generated_at": "2026-03-06T16:00:00Z"
+}
+```
+
+### Single event
+
+`sift event get <event_id> --format json` should return one canonical event object that conforms to `event.schema.json`.
+
+### Digest
+
+`sift digest <scope> --format json` should return:
+
+```json
+{
+  "scope": "crypto",
+  "window": "24h",
+  "generated_at": "2026-03-06T16:00:00Z",
+  "event_ids": [],
+  "markdown_path": "output/digests/crypto/24h.md"
+}
+```
+
+## Exit codes
+
+- `0` success
+- `1` operational failure
+- `2` invalid arguments
+- `3` record not found
+- `4` policy block, such as an unapproved source action
+
 ## Example commands
 
 ```bash

@@ -1,0 +1,106 @@
+{
+  "version": 1,
+  "category": "crypto",
+  "updated_at": "2026-03-06T16:45:00Z",
+  "sources": [
+    {
+      "source_id": "coindesk_rss",
+      "source_name": "CoinDesk",
+      "source_class": "media",
+      "access_method": "rss",
+      "url": "https://www.coindesk.com/arc/outboundfeeds/rss",
+      "source_weight": 1.0,
+      "rights_mode": "metadata_plus_excerpt",
+      "excerpt_allowed": true,
+      "summary_allowed": true,
+      "default_editorial_type": "report",
+      "reviewed_at": "2026-03-06",
+      "notes": "Primary crypto media source for v0."
+    },
+    {
+      "source_id": "cointelegraph_rss",
+      "source_name": "Cointelegraph",
+      "source_class": "media",
+      "access_method": "rss",
+      "url": "https://cointelegraph.com/rss",
+      "source_weight": 0.9,
+      "rights_mode": "metadata_plus_excerpt",
+      "excerpt_allowed": true,
+      "summary_allowed": true,
+      "default_editorial_type": "report",
+      "reviewed_at": "2026-03-06",
+      "notes": "High-volume source; scoring should prevent source dominance."
+    },
+    {
+      "source_id": "decrypt_feed",
+      "source_name": "Decrypt",
+      "source_class": "media",
+      "access_method": "rss",
+      "url": "https://decrypt.co/feed",
+      "source_weight": 0.85,
+      "rights_mode": "metadata_plus_summary",
+      "excerpt_allowed": false,
+      "summary_allowed": true,
+      "default_editorial_type": "report",
+      "reviewed_at": "2026-03-06",
+      "notes": "Conservative mode due to terms sensitivity around automated use."
+    },
+    {
+      "source_id": "cryptoslate_feed",
+      "source_name": "CryptoSlate",
+      "source_class": "media",
+      "access_method": "rss",
+      "url": "https://cryptoslate.com/feed/",
+      "source_weight": 0.8,
+      "rights_mode": "metadata_plus_excerpt",
+      "excerpt_allowed": true,
+      "summary_allowed": true,
+      "default_editorial_type": "report",
+      "reviewed_at": "2026-03-06",
+      "notes": "Often provides rich feed content; do not treat feed body as full-text license."
+    },
+    {
+      "source_id": "bitcoinmagazine_feed",
+      "source_name": "Bitcoin Magazine",
+      "source_class": "media",
+      "access_method": "rss",
+      "url": "http://bitcoinmagazine.com/feed",
+      "source_weight": 0.75,
+      "rights_mode": "metadata_plus_excerpt",
+      "excerpt_allowed": true,
+      "summary_allowed": true,
+      "default_editorial_type": "report",
+      "reviewed_at": "2026-03-06",
+      "notes": "BTC-specific source with strong topic bias."
+    },
+    {
+      "source_id": "sec_press_releases",
+      "source_name": "SEC Press Releases",
+      "source_class": "official",
+      "access_method": "rss",
+      "url": "https://www.sec.gov/news/pressreleases.rss",
+      "source_weight": 0.95,
+      "rights_mode": "metadata_plus_excerpt",
+      "excerpt_allowed": true,
+      "summary_allowed": true,
+      "default_editorial_type": "official_announcement",
+      "reviewed_at": "2026-03-06",
+      "notes": "Official regulator source. High confirmation value for policy and enforcement events."
+    },
+    {
+      "source_id": "kraken_blog",
+      "source_name": "Kraken Blog",
+      "source_class": "official",
+      "access_method": "rss",
+      "url": "https://blog.kraken.com/feed",
+      "source_weight": 0.7,
+      "rights_mode": "metadata_plus_excerpt",
+      "excerpt_allowed": true,
+      "summary_allowed": true,
+      "default_editorial_type": "official_announcement",
+      "reviewed_at": "2026-03-06",
+      "notes": "Official exchange source for product and market announcements."
+    }
+  ]
+}
+

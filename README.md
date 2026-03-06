@@ -81,3 +81,4 @@ The implementation does not exist yet. This repo currently defines:
 - [llms.txt](llms.txt)
 - [project.manifest.json](project.manifest.json)
 - [docs/README.md](docs/README.md)
+- [docs/plans/2026-03-06-sift-v0-execution-spec.md](docs/plans/2026-03-06-sift-v0-execution-spec.md)

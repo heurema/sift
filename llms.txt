@@ -11,11 +11,13 @@ Key themes: crypto news, event clustering, provenance, rights-aware ingestion, a
 - [README](README.md): Project overview, thesis, and current scope.
 - [Manifesto](manifesto.md): Core principles and claim boundary.
 - [Foundation Plan](docs/plans/2026-03-06-sift-v0-foundation.md): What v0 is, why it exists, and what it must ship first.
+- [Execution Spec](docs/plans/2026-03-06-sift-v0-execution-spec.md): Concrete v0 implementation decisions for sources, scoring, storage, CLI, and UI.
 
 ## Contracts
 
 - [Event Schema](docs/contracts/event.schema.json): Canonical event record shape.
 - [CLI Contract](docs/contracts/cli.md): Primary local access surface for agents in v0.
+- [Source Registry Seed](docs/contracts/source-registry.seed.json): Approved initial source set for v0.
 - [OpenAPI](docs/contracts/openapi.yaml): Future remote API boundary, not the primary access path for v0.
 
 ## Policy
