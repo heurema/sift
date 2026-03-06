@@ -1,23 +1,26 @@
 {
-  "project_id": "newslayer",
-  "name": "Newslayer",
+  "project_id": "sift",
+  "name": "Sift",
   "status": "docs_first",
-  "thesis": "Agent-native crypto news layer with a human workspace on top.",
+  "thesis": "Signal over noise for humans and agents.",
   "current_scope": {
     "category": "crypto",
     "ui": "human workspace",
     "canonical_truth": "typed_json",
-    "agent_surfaces": ["markdown", "llms.txt", "rest_json"],
+    "agent_surfaces": ["cli", "markdown", "llms.txt"],
+    "access_strategy": "cli_first",
     "non_goals": [
       "broad scraping-first ingestion",
       "full text storage by default",
       "multi-category expansion before crypto stability",
-      "mcp_in_v0"
+      "mcp_in_v0",
+      "remote_api_as_primary_surface"
     ]
   },
   "core_objects": ["article", "event", "entity", "digest"],
   "truth_boundary": {
     "schema": "docs/contracts/event.schema.json",
+    "cli": "docs/contracts/cli.md",
     "api": "docs/contracts/openapi.yaml",
     "policy": "docs/policies/source-rights.md"
   },
@@ -33,8 +36,7 @@
     "readme": "README.md",
     "manifesto": "manifesto.md",
     "llms": "llms.txt",
-    "foundation_plan": "docs/plans/2026-03-06-newslayer-v0-foundation.md",
+    "foundation_plan": "docs/plans/2026-03-06-sift-v0-foundation.md",
     "research": "docs/research/2026-03-06-agent-native-news-landscape.md"
   }
 }
-

@@ -2,7 +2,7 @@
 
 ## Plans
 
-- [2026-03-06-newslayer-v0-foundation.md](plans/2026-03-06-newslayer-v0-foundation.md) — project thesis, v0 boundary, object model, delivery surfaces, and roadmap
+- [2026-03-06-sift-v0-foundation.md](plans/2026-03-06-sift-v0-foundation.md) — project thesis, v0 boundary, object model, delivery surfaces, and roadmap
 
 ## Policies
 
@@ -11,7 +11,8 @@
 ## Contracts
 
 - [event.schema.json](contracts/event.schema.json) — canonical event shape
-- [openapi.yaml](contracts/openapi.yaml) — public API outline for v0
+- [cli.md](contracts/cli.md) — primary local access surface for v0
+- [openapi.yaml](contracts/openapi.yaml) — future remote API outline
 
 ## Research
 
@@ -24,4 +25,3 @@
 - [AGENTS.md](../AGENTS.md)
 - [llms.txt](../llms.txt)
 - [project.manifest.json](../project.manifest.json)
-

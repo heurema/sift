@@ -1,21 +1,22 @@
-# Newslayer
+# Sift
 
-> Agent-native crypto news layer with a human workspace on top.
+> Signal over noise for humans and agents.
 
-Newslayer is a docs-first project for a crypto news system that models articles, events, entities, and digests. The system is designed for both human operators and AI agents. Canonical truth lives in typed JSON records. Markdown is used for reading surfaces and agent handoff.
+Sift is a docs-first project for a crypto news system that models articles, events, entities, and digests. The system is designed for both human operators and AI agents. Canonical truth lives in typed JSON records. Markdown is used for reading surfaces and agent handoff. Local agent access is CLI-first.
 
-Key themes: crypto news, event clustering, provenance, rights-aware ingestion, agent-native delivery, JSON contracts, Markdown digests, llms.txt, MCP-ready design.
+Key themes: crypto news, event clustering, provenance, rights-aware ingestion, agent-native delivery, CLI-first access, JSON contracts, Markdown digests, llms.txt.
 
 ## Start Here
 
 - [README](README.md): Project overview, thesis, and current scope.
 - [Manifesto](manifesto.md): Core principles and claim boundary.
-- [Foundation Plan](docs/plans/2026-03-06-newslayer-v0-foundation.md): What v0 is, why it exists, and what it must ship first.
+- [Foundation Plan](docs/plans/2026-03-06-sift-v0-foundation.md): What v0 is, why it exists, and what it must ship first.
 
 ## Contracts
 
 - [Event Schema](docs/contracts/event.schema.json): Canonical event record shape.
-- [OpenAPI](docs/contracts/openapi.yaml): Public API boundary for v0.
+- [CLI Contract](docs/contracts/cli.md): Primary local access surface for agents in v0.
+- [OpenAPI](docs/contracts/openapi.yaml): Future remote API boundary, not the primary access path for v0.
 
 ## Policy
 
@@ -28,4 +29,3 @@ Key themes: crypto news, event clustering, provenance, rights-aware ingestion, a
 ## Research
 
 - [Agent-Native News Landscape](docs/research/2026-03-06-agent-native-news-landscape.md): External patterns and adjacent systems that justify the architecture.
-

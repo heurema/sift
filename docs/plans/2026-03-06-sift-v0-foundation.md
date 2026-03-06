@@ -1,11 +1,11 @@
-# Newslayer v0 Foundation
+# Sift v0 Foundation
 
 Дата: 2026-03-06
 Статус: draft
 
 ## One-liner
 
-Newslayer is a human-readable crypto news workspace backed by an agent-native event layer.
+Sift is a human-readable crypto news workspace backed by an agent-native event layer.
 
 ## Problem
 
@@ -62,7 +62,7 @@ Why:
 - typed filters;
 - better delta sync;
 - reliable provenance handling;
-- cleaner contract for future MCP tools.
+- cleaner contract for CLI access and any future adapters.
 
 Markdown remains important, but only as a projection layer:
 
@@ -76,19 +76,21 @@ Markdown remains important, but only as a projection layer:
 ### P0
 
 - Human UI
-- REST/JSON API
+- CLI
+- Event JSON records
 - Per-event Markdown
 - Digest Markdown
+- `llms.txt`
 
 ### P1
 
-- `llms.txt`
+- REST/JSON API
 - windowed context pages
 - JSON Feed 1.1
 
 ### P2
 
-- MCP server with narrow retrieval tools
+- MCP adapter with narrow retrieval tools
 
 ## v0 scope
 
@@ -102,6 +104,7 @@ Markdown remains important, but only as a projection layer:
 - source provenance;
 - rights-aware storage mode;
 - human workspace with filters and digest view;
+- CLI for local agent access;
 - JSON and Markdown output surfaces.
 
 ### Excluded
@@ -111,7 +114,8 @@ Markdown remains important, but only as a projection layer:
 - embeddings-first architecture;
 - generic web scraping as the main ingestion strategy;
 - full-text storage by default;
-- MCP in the first shipping slice.
+- MCP in the first shipping slice;
+- remote API as the primary access path.
 
 ## v0 user experience
 
@@ -125,7 +129,8 @@ Markdown remains important, but only as a projection layer:
 
 ### Agent client
 
-- queries events by scope and time window;
+- runs local CLI commands;
+- requests stable `json` output;
 - fetches one stable event record;
 - reads a compact Markdown projection if needed;
 - uses provenance and confidence metadata programmatically.
@@ -157,12 +162,13 @@ Order of preference:
 4. human UI shell
 5. JSON/Markdown publisher
 6. `llms.txt` and context windows
-7. MCP surface
+7. remote API
+8. MCP adapter
 
 ## Success criteria for the first build phase
 
 - the object model is stable enough to implement;
 - rights policy is explicit enough to avoid accidental overreach;
 - a future agent can discover the repo and its contracts without reading the whole tree;
-- human UI and agent delivery are clearly defined as two surfaces over one core.
-
+- human UI and agent delivery are clearly defined as two surfaces over one core;
+- the CLI is clear enough to become the first real integration boundary.

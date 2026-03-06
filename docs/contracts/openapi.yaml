@@ -1,15 +1,16 @@
 openapi: 3.1.0
 info:
-  title: Newslayer API
+  title: Sift API
   version: 0.1.0
-  summary: Agent-native crypto news API
+  summary: Future remote API for Sift
   description: |
-    v0 API outline for Newslayer.
+    P1 remote API outline for Sift.
 
     Canonical truth lives in typed JSON records.
+    v0 local agent access is CLI-first.
     Human UI and Markdown projections are built on top of the same event layer.
 servers:
-  - url: https://api.newslayer.local
+  - url: https://api.sift.local
 paths:
   /v1/events:
     get:
@@ -195,4 +196,3 @@ components:
             type: object
         rights:
           type: object
-

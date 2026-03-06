@@ -31,7 +31,7 @@ The system should provide both without splitting the truth boundary.
 
 ## Claim Boundary
 
-Newslayer should claim only this:
+Sift should claim only this:
 
 - source records were collected and normalized;
 - related records were clustered into events;
@@ -45,4 +45,3 @@ It should not claim:
 - perfect clustering;
 - market correctness;
 - legal permission beyond the recorded source policy.
-

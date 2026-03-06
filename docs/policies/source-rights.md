@@ -4,7 +4,7 @@
 
 News ingestion is useless if the rights model is sloppy.
 
-This document defines the default behavior for how Newslayer collects, stores, and republishes information from external sources.
+This document defines the default behavior for how Sift collects, stores, and republishes information from external sources.
 
 ## Default posture
 
@@ -108,4 +108,3 @@ Every source added to the registry must declare:
 ## Operational rule
 
 If rights are unclear, choose the narrower storage mode and record the uncertainty.
-

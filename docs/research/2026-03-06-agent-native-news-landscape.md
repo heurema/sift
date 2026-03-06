@@ -7,7 +7,7 @@
 
 - Markdown is now a practical delivery format for AI agents, but it should not replace typed system contracts.
 - `llms.txt` is emerging as a discovery layer for agent-readable project context.
-- MCP is a credible future access layer, but not necessary for v0 if JSON and Markdown are already sound.
+- MCP is a credible future access layer, but not necessary for v0 if JSON, CLI, and Markdown are already sound.
 - Crypto news is rich in feeds and aggregators, but still weak in agent-native event contracts and rights-aware output.
 - The strongest differentiator is not "more summaries". It is event modeling plus provenance plus rights-aware delivery.
 
@@ -40,8 +40,9 @@ MCP has crossed from theory to product reality.
 
 Implication:
 
-- Newslayer should design its JSON contracts so that a future MCP server is straightforward;
+- Sift should design its JSON contracts so that a future MCP adapter is straightforward;
 - shipping MCP before the base event model stabilizes would be premature.
+- for local agent workflows, a CLI is the more efficient first boundary.
 
 ### Crypto feeds are available, but rights are uneven
 
@@ -58,9 +59,9 @@ For this space, the right stack of abstractions is:
 
 1. typed event records as canonical truth;
 2. Markdown projections for reading;
-3. REST/JSON for programmatic access;
+3. CLI for local agent access;
 4. `llms.txt` for discovery;
-5. MCP later.
+5. REST/JSON later when remote access is justified;
+6. MCP later.
 
 Anything that starts with page scraping or Markdown-only storage is likely to drift into a fragile media wrapper instead of an agent-native news layer.
-

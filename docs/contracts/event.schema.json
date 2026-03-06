@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://newslayer.local/schemas/event.schema.json",
-  "title": "Newslayer Event",
+  "$id": "https://sift.local/schemas/event.schema.json",
+  "title": "Sift Event",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -219,4 +219,3 @@
     }
   }
 }
-

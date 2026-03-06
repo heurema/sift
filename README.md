@@ -1,14 +1,15 @@
-# Newslayer
+# Sift
 
-> Human-readable workspace. Agent-native news layer.
+> Signal over noise for humans and agents.
 
-Newslayer is a docs-first project for a crypto news system that serves both people and AI agents.
+Sift is a docs-first project for a crypto news system that serves both people and AI agents.
 
 The core idea is simple:
 
 - humans need a fast, deduplicated workspace with filters and digest views;
 - agents need typed event records, provenance, stable IDs, and compact Markdown context;
 - the system should treat `JSON` as the canonical truth and `Markdown` as a projection for reading and handoff.
+- local agents should be able to work through a simple `CLI` without needing MCP.
 
 ## Why this exists
 
@@ -19,7 +20,7 @@ Most existing products optimize for one of two things:
 - a human dashboard with weak machine contracts;
 - a feed or API with weak event modeling and weak provenance.
 
-Newslayer aims at the gap between them:
+Sift aims at the gap between them:
 
 - cluster many articles into one event;
 - preserve source provenance and rights metadata;
@@ -43,8 +44,8 @@ v0 is intentionally narrow:
 - category: `crypto` only;
 - ingestion: `RSS/API first`;
 - storage default: metadata plus generated summaries, not full text by default;
-- delivery: human UI, REST/JSON, Markdown, `llms.txt`;
-- MCP: later, after the base contracts are stable.
+- delivery: human UI, typed JSON records, CLI, Markdown, `llms.txt`;
+- remote API and MCP: later, after the base contracts are stable.
 
 ## Design rules
 
@@ -56,7 +57,7 @@ v0 is intentionally narrow:
 
 ## Lineage
 
-Newslayer is informed by local work and adjacent patterns:
+Sift is informed by local work and adjacent patterns:
 
 - `Herald` as a local-first news intelligence workflow;
 - `llms.txt` and Markdown-for-agents patterns for agent delivery;
@@ -80,4 +81,3 @@ The implementation does not exist yet. This repo currently defines:
 - [llms.txt](llms.txt)
 - [project.manifest.json](project.manifest.json)
 - [docs/README.md](docs/README.md)
-
