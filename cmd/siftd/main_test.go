@@ -8,6 +8,7 @@ func TestLoadConfigFromEnv(t *testing.T) {
 	t.Setenv("SIFTD_ZITADEL_AUDIENCE", "audience")
 	t.Setenv("SIFTD_SYNC_INTERVAL", "1m")
 	t.Setenv("SIFTD_SYNC_TIMEOUT", "30s")
+	t.Setenv("SIFTD_RETENTION", "720h")
 	t.Setenv("SIFTD_SYNC_ON_START", "false")
 	t.Setenv("SIFTD_WS_ALLOWED_ORIGINS", "https://sift.local, https://console.sift.local")
 
@@ -25,6 +26,9 @@ func TestLoadConfigFromEnv(t *testing.T) {
 	if cfg.SyncTimeout.String() != "30s" {
 		t.Fatalf("unexpected sync timeout: %s", cfg.SyncTimeout)
 	}
+	if cfg.RetentionWindow.String() != "720h0m0s" {
+		t.Fatalf("unexpected retention window: %s", cfg.RetentionWindow)
+	}
 	if len(cfg.WSAllowedOrigins) != 2 {
 		t.Fatalf("unexpected ws allowed origins count: %d", len(cfg.WSAllowedOrigins))
 	}
@@ -40,5 +44,16 @@ func TestLoadConfigFromEnvRequiresMandatoryValues(t *testing.T) {
 
 	if _, err := loadConfigFromEnv(); err == nil {
 		t.Fatal("expected error for missing required env values")
+	}
+}
+
+func TestLoadConfigFromEnvRejectsNegativeRetention(t *testing.T) {
+	t.Setenv("SIFTD_POSTGRES_DSN", "postgres://user:pass@localhost:5432/sift?sslmode=disable")
+	t.Setenv("SIFTD_ZITADEL_ISSUER", "https://auth.example.com")
+	t.Setenv("SIFTD_ZITADEL_AUDIENCE", "audience")
+	t.Setenv("SIFTD_RETENTION", "-1h")
+
+	if _, err := loadConfigFromEnv(); err == nil {
+		t.Fatal("expected error for negative retention window")
 	}
 }

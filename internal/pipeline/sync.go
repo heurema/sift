@@ -35,12 +35,13 @@ type NewRunIDFunc func(now time.Time) (string, error)
 type NowFunc func() time.Time
 
 type Options struct {
-	Mode           Mode
-	RegistryPath   string
-	OutputDir      string
-	FetchFeedItems FetchFeedItemsFunc
-	NewRunID       NewRunIDFunc
-	Now            NowFunc
+	Mode            Mode
+	RegistryPath    string
+	OutputDir       string
+	RetentionWindow time.Duration
+	FetchFeedItems  FetchFeedItemsFunc
+	NewRunID        NewRunIDFunc
+	Now             NowFunc
 }
 
 type Summary struct {
@@ -68,6 +69,7 @@ type Store interface {
 	ListArticlesForClustering(ctx context.Context) ([]event.ArticleInput, error)
 	ReplaceEvents(ctx context.Context, records []event.Record) error
 	ListEvents(ctx context.Context) ([]event.Record, error)
+	ApplyRetention(ctx context.Context, cutoff time.Time) error
 	CountDegradedSources(ctx context.Context, threshold int) (int, error)
 	InsertRun(ctx context.Context, run sqlite.Run) error
 }
@@ -83,6 +85,9 @@ func RunSync(ctx context.Context, store Store, opts Options) (Summary, error) {
 	}
 	if !isValidMode(mode) {
 		return Summary{}, fmt.Errorf("unsupported sync mode %q", mode)
+	}
+	if opts.RetentionWindow < 0 {
+		return Summary{}, fmt.Errorf("retention window must be >= 0")
 	}
 
 	if opts.RegistryPath == "" {
@@ -195,6 +200,13 @@ func RunSync(ctx context.Context, store Store, opts Options) (Summary, error) {
 	}
 
 	if mode != ModeFetchOnly {
+		if opts.RetentionWindow > 0 {
+			cutoff := now().Add(-opts.RetentionWindow)
+			if err := store.ApplyRetention(ctx, cutoff); err != nil {
+				return Summary{}, err
+			}
+		}
+
 		articleInputs, err := store.ListArticlesForClustering(ctx)
 		if err != nil {
 			return Summary{}, err
