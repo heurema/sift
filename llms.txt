@@ -16,6 +16,8 @@ Key themes: crypto news, event clustering, provenance, rights-aware ingestion, a
 - [Sift Pro Execution Plan](docs/plans/2026-03-07-sift-pro-execution-plan.md): Narrow hosted implementation path for the first paid service slice, now anchored on Postgres and Zitadel.
 - [Sift Pro Slice 1 Blueprint](docs/plans/2026-03-07-sift-pro-slice-1-blueprint.md): File-level extraction plan for the shared runtime that keeps local SQLite separate from the future hosted Postgres path.
 - [Siftd Runbook](docs/runbooks/siftd.md): Single-node operator runbook for deploying the hosted service with systemd, Postgres, and Zitadel.
+- [Dockerfile](Dockerfile): Multi-stage container image definition for the hosted `siftd` runtime.
+- [Publish Image Workflow](.github/workflows/publish-image.yml): GHCR image publication for `ghcr.io/heurema/sift` on `main` when hosted runtime inputs change.
 - [CLI Entry](cmd/sift/main.go): Current Go CLI implementation entry point.
 - [Server Entry](cmd/siftd/main.go): Hosted server entry point with Postgres-backed scheduler and Zitadel-protected read path.
 - [Siftd Env Example](ops/env/siftd.env.example): Example hosted environment contract for systemd deployment.

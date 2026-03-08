@@ -13,12 +13,27 @@ Target model:
 - one reverse proxy in front of `127.0.0.1:8080` if public HTTPS is required.
 
 This is intentionally a single-node operating model.
+The repository also publishes a container image for GitOps and cluster deployment, but
+this runbook remains the host-first operating baseline.
 
 ## Repository Assets
 
 - systemd unit: `ops/systemd/siftd.service`
 - environment template: `ops/env/siftd.env.example`
 - binary entrypoint: `cmd/siftd/main.go`
+- container image build: `Dockerfile`
+- CI image publish workflow: `.github/workflows/publish-image.yml`
+
+## Container Artifact
+
+The repository publishes:
+
+- image: `ghcr.io/heurema/sift`
+- mutable convenience tag: `latest`
+- rollout tag format: `dev-<sha7>-<timestamp>`
+
+The hosted GitOps path should pin one of the `dev-*` tags. `latest` is for manual
+inspection and ad-hoc runs only.
 
 ## Required Inputs
 

@@ -1,0 +1,10 @@
+.git
+.github
+.codex
+.claude
+output
+state
+tmp
+*.db
+*.sqlite
+*.sqlite3
