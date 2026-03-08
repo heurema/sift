@@ -21,7 +21,7 @@
 
 ## Runbooks
 
-- [siftd.md](runbooks/siftd.md) — single-node operator runbook for the hosted `siftd` service
+- [siftd.md](runbooks/siftd.md) — operator runbook for the hosted `siftd` service, including single-node host deployment and container artifact notes
 
 ## Research
 

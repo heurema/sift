@@ -90,7 +90,8 @@ Implemented now:
   - health and readiness endpoints (`/healthz`, `/readyz`);
   - Zitadel-protected read API (`/v1/events`, `/v1/events/{event_id}`, `/v1/digests/{scope}/{window}`);
   - authenticated WebSocket stream endpoint (`/v1/ws`) with post-sync update notifications (`event.upserted`, `digest.updated`).
-  - operator deployment assets for single-node Linux hosting (`ops/systemd/siftd.service`, `ops/env/siftd.env.example`, `docs/runbooks/siftd.md`).
+  - operator deployment assets for single-node Linux hosting (`ops/systemd/siftd.service`, `ops/env/siftd.env.example`, `docs/runbooks/siftd.md`);
+  - container build artifact (`Dockerfile`) and GHCR publish path (`ghcr.io/heurema/sift`) with deterministic `dev-<sha7>-<timestamp>` tags from CI.
 
 Not implemented yet:
 
