@@ -1,0 +1,31 @@
+[Unit]
+Description=Sift hosted event service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=sift
+Group=sift
+WorkingDirectory=/srv/sift/current
+EnvironmentFile=/etc/sift/siftd.env
+ExecStart=/srv/sift/current/siftd
+Restart=always
+RestartSec=5s
+StateDirectory=sift
+StateDirectoryMode=0750
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectControlGroups=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+ReadWritePaths=/var/lib/sift
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

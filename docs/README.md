@@ -19,6 +19,10 @@
 - [source-registry.seed.json](contracts/source-registry.seed.json) — approved v0 source set and source defaults
 - [openapi.yaml](contracts/openapi.yaml) — post-v0 hosted API outline for Sift Pro, not the primary access path for v0
 
+## Runbooks
+
+- [siftd.md](runbooks/siftd.md) — single-node operator runbook for the hosted `siftd` service
+
 ## Research
 
 - [2026-03-06-agent-native-news-landscape.md](research/2026-03-06-agent-native-news-landscape.md) — market and protocol context behind the design
