@@ -12,13 +12,19 @@ Key themes: crypto news, event clustering, provenance, rights-aware ingestion, a
 - [Manifesto](manifesto.md): Core principles and claim boundary.
 - [Foundation Plan](docs/plans/2026-03-06-sift-v0-foundation.md): What v0 is, why it exists, and what it must ship first.
 - [Execution Spec](docs/plans/2026-03-06-sift-v0-execution-spec.md): Concrete v0 implementation decisions for sources, scoring, storage, CLI, and UI.
+- [Sift Pro MVP](docs/plans/2026-03-07-sift-pro-mvp.md): Post-v0 hosted premium plan with Postgres storage and Zitadel-backed identity.
+- [Sift Pro Execution Plan](docs/plans/2026-03-07-sift-pro-execution-plan.md): Narrow hosted implementation path for the first paid service slice, now anchored on Postgres and Zitadel.
+- [Sift Pro Slice 1 Blueprint](docs/plans/2026-03-07-sift-pro-slice-1-blueprint.md): File-level extraction plan for the shared runtime that keeps local SQLite separate from the future hosted Postgres path.
+- [CLI Entry](cmd/sift/main.go): Current Go CLI implementation entry point.
+- [Server Entry](cmd/siftd/main.go): Hosted server entry point with Postgres-backed scheduler and Zitadel-protected read path.
 
 ## Contracts
 
 - [Event Schema](docs/contracts/event.schema.json): Canonical event record shape.
 - [CLI Contract](docs/contracts/cli.md): Primary local access surface for agents in v0.
 - [Source Registry Seed](docs/contracts/source-registry.seed.json): Approved initial source set for v0.
-- [OpenAPI](docs/contracts/openapi.yaml): Future remote API boundary, not the primary access path for v0.
+- [Clustering Eval Dataset](docs/contracts/clustering-eval.v0.json): Labeled title pairs for precision gate verification.
+- [OpenAPI](docs/contracts/openapi.yaml): Post-v0 hosted API boundary for Sift Pro, not the primary access path for v0.
 
 ## Policy
 

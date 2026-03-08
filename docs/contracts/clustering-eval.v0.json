@@ -1,0 +1,128 @@
+{
+  "version": 1,
+  "updated_at": "2026-03-07",
+  "metric": "sorensen_dice_trigram_on_normalized_titles",
+  "same_event_threshold": 0.82,
+  "target_precision": 0.9,
+  "pairs": [
+    { "id": "se001", "title_a": "Bitcoin ETF inflows hit $500 million", "title_b": "Bitcoin ETF inflows reach $500 million", "label": "same_event" },
+    { "id": "se002", "title_a": "Bitcoin ETF inflows rise to $820 million", "title_b": "Bitcoin ETF inflows climb to $820 million", "label": "same_event" },
+    { "id": "se003", "title_a": "Bitcoin ETF net inflows top $1 billion", "title_b": "Bitcoin ETF net inflows exceed $1 billion", "label": "same_event" },
+    { "id": "se004", "title_a": "Bitcoin ETF daily inflows jump to $240 million", "title_b": "Bitcoin ETF daily inflows surge to $240 million", "label": "same_event" },
+    { "id": "se005", "title_a": "Bitcoin ETF inflows rebound after three days", "title_b": "Bitcoin ETF inflows recover after three days", "label": "same_event" },
+
+    { "id": "se006", "title_a": "Bitcoin ETF outflows hit $210 million", "title_b": "Bitcoin ETF outflows reach $210 million", "label": "same_event" },
+    { "id": "se007", "title_a": "Bitcoin ETF outflows continue for fifth day", "title_b": "Bitcoin ETF outflows extend to fifth day", "label": "same_event" },
+    { "id": "se008", "title_a": "Spot Bitcoin ETFs record largest outflow this month", "title_b": "Spot Bitcoin ETFs post biggest outflow this month", "label": "same_event" },
+    { "id": "se009", "title_a": "US spot Bitcoin ETFs see net outflows on Tuesday", "title_b": "US spot Bitcoin ETFs log net outflows on Tuesday", "label": "same_event" },
+    { "id": "se010", "title_a": "Bitcoin ETF redemptions accelerate before CPI data", "title_b": "Bitcoin ETF redemptions speed up before CPI data", "label": "same_event" },
+
+    { "id": "se011", "title_a": "Ethereum staking deposits rise ahead of upgrade", "title_b": "Ethereum staking deposits climb ahead of upgrade", "label": "same_event" },
+    { "id": "se012", "title_a": "ETH staking queue grows to 400000 validators", "title_b": "ETH staking queue expands to 400000 validators", "label": "same_event" },
+    { "id": "se013", "title_a": "Ethereum staking participation reaches all time high", "title_b": "Ethereum staking participation hits all time high", "label": "same_event" },
+    { "id": "se014", "title_a": "Liquid staking inflows boost Ethereum validator demand", "title_b": "Liquid staking inflows lift Ethereum validator demand", "label": "same_event" },
+    { "id": "se015", "title_a": "ETH stakers add 2 million tokens this quarter", "title_b": "ETH stakers add two million tokens this quarter", "label": "same_event" },
+
+    { "id": "se016", "title_a": "SEC settles charges with crypto exchange over custody rules", "title_b": "SEC settles case with crypto exchange on custody rules", "label": "same_event" },
+    { "id": "se017", "title_a": "SEC reaches settlement with token issuer", "title_b": "SEC finalizes settlement with token issuer", "label": "same_event" },
+    { "id": "se018", "title_a": "US SEC and exchange agree to civil settlement", "title_b": "US SEC and exchange strike civil settlement", "label": "same_event" },
+    { "id": "se019", "title_a": "SEC enforcement action ends in $25 million settlement", "title_b": "SEC enforcement case ends with $25 million settlement", "label": "same_event" },
+    { "id": "se020", "title_a": "Regulator settles unregistered offerings lawsuit", "title_b": "Regulator settles lawsuit on unregistered offerings", "label": "same_event" },
+
+    { "id": "se021", "title_a": "Kraken secures federal bank charter approval", "title_b": "Kraken wins federal bank charter approval", "label": "same_event" },
+    { "id": "se022", "title_a": "Kraken banking charter moves forward in Washington", "title_b": "Kraken bank charter advances in Washington", "label": "same_event" },
+    { "id": "se023", "title_a": "US regulators approve Kraken trust bank application", "title_b": "US regulators clear Kraken trust bank application", "label": "same_event" },
+    { "id": "se024", "title_a": "Kraken receives conditional approval for bank license", "title_b": "Kraken gets conditional approval for bank license", "label": "same_event" },
+    { "id": "se025", "title_a": "Kraken says charter approval expands payment rails", "title_b": "Kraken says charter approval broadens payment rails", "label": "same_event" },
+
+    { "id": "se026", "title_a": "Solana outage halts block production for 45 minutes", "title_b": "Solana outage stops block production for 45 minutes", "label": "same_event" },
+    { "id": "se027", "title_a": "Solana network recovers after validator restart", "title_b": "Solana network resumes after validator restart", "label": "same_event" },
+    { "id": "se028", "title_a": "Solana validators coordinate restart after incident", "title_b": "Solana validators coordinate reboot after incident", "label": "same_event" },
+    { "id": "se029", "title_a": "SOL chain disruption linked to transaction spam", "title_b": "SOL chain interruption tied to transaction spam", "label": "same_event" },
+    { "id": "se030", "title_a": "Solana developers publish postmortem on outage", "title_b": "Solana developers release postmortem on outage", "label": "same_event" },
+
+    { "id": "se031", "title_a": "Binance lists new DeFi token on spot market", "title_b": "Binance adds new DeFi token to spot market", "label": "same_event" },
+    { "id": "se032", "title_a": "Coinbase announces listing for gaming token", "title_b": "Coinbase confirms listing of gaming token", "label": "same_event" },
+    { "id": "se033", "title_a": "Exchange listing sends token up 25 percent", "title_b": "Exchange listing pushes token up 25 percent", "label": "same_event" },
+    { "id": "se034", "title_a": "Major exchange plans listing for layer2 asset", "title_b": "Major exchange schedules listing for layer2 asset", "label": "same_event" },
+    { "id": "se035", "title_a": "Token rallies after surprise listing announcement", "title_b": "Token jumps after surprise listing announcement", "label": "same_event" },
+
+    { "id": "se036", "title_a": "Stablecoin issuer publishes monthly reserve attestation", "title_b": "Stablecoin issuer releases monthly reserve attestation", "label": "same_event" },
+    { "id": "se037", "title_a": "USDT reserves show larger Treasury allocation", "title_b": "USDT reserves reveal larger Treasury allocation", "label": "same_event" },
+    { "id": "se038", "title_a": "USDC reserve report confirms full backing", "title_b": "USDC reserve report confirms one to one backing", "label": "same_event" },
+    { "id": "se039", "title_a": "Stablecoin transparency report details cash composition", "title_b": "Stablecoin transparency report details reserve composition", "label": "same_event" },
+    { "id": "se040", "title_a": "Issuer discloses reserve mix after audit", "title_b": "Issuer reveals reserve mix after audit", "label": "same_event" },
+
+    { "id": "se041", "title_a": "Bitcoin mining difficulty climbs 4 percent", "title_b": "Bitcoin mining difficulty rises 4 percent", "label": "same_event" },
+    { "id": "se042", "title_a": "Hashrate reaches record as difficulty adjusts upward", "title_b": "Hashrate hits record as difficulty adjusts upward", "label": "same_event" },
+    { "id": "se043", "title_a": "Mining revenue falls after difficulty increase", "title_b": "Mining revenue drops after difficulty increase", "label": "same_event" },
+    { "id": "se044", "title_a": "Difficulty adjustment pressures smaller miners", "title_b": "Difficulty adjustment squeezes smaller miners", "label": "same_event" },
+    { "id": "se045", "title_a": "Miners sell more BTC after tougher difficulty epoch", "title_b": "Miners sell more BTC after harder difficulty epoch", "label": "same_event" },
+
+    { "id": "se046", "title_a": "Ripple and SEC file joint motion to pause appeal", "title_b": "Ripple and SEC submit joint motion to pause appeal", "label": "same_event" },
+    { "id": "se047", "title_a": "XRP lawsuit enters settlement talks stage", "title_b": "XRP lawsuit moves into settlement talks stage", "label": "same_event" },
+    { "id": "se048", "title_a": "Court grants extension in Ripple SEC case", "title_b": "Court approves extension in Ripple SEC case", "label": "same_event" },
+    { "id": "se049", "title_a": "Ripple legal update narrows issues for trial", "title_b": "Ripple legal update reduces issues for trial", "label": "same_event" },
+    { "id": "se050", "title_a": "SEC Ripple dispute heads toward negotiated resolution", "title_b": "SEC Ripple dispute moves toward negotiated resolution", "label": "same_event" },
+
+    { "id": "de001", "title_a": "Bitcoin ETF inflows hit $500 million", "title_b": "Ethereum staking deposits rise ahead of upgrade", "label": "different_event" },
+    { "id": "de002", "title_a": "Solana outage halts block production for 45 minutes", "title_b": "SEC settles charges with crypto exchange over custody rules", "label": "different_event" },
+    { "id": "de003", "title_a": "Kraken secures federal bank charter approval", "title_b": "Stablecoin issuer publishes monthly reserve attestation", "label": "different_event" },
+    { "id": "de004", "title_a": "Binance lists new DeFi token on spot market", "title_b": "Bitcoin mining difficulty climbs 4 percent", "label": "different_event" },
+    { "id": "de005", "title_a": "Ripple and SEC file joint motion to pause appeal", "title_b": "Coinbase announces listing for gaming token", "label": "different_event" },
+
+    { "id": "de006", "title_a": "USDC reserve report confirms full backing", "title_b": "Solana validators coordinate restart after incident", "label": "different_event" },
+    { "id": "de007", "title_a": "Exchange listing sends token up 25 percent", "title_b": "US regulators approve Kraken trust bank application", "label": "different_event" },
+    { "id": "de008", "title_a": "ETH staking queue grows to 400000 validators", "title_b": "Bitcoin ETF outflows hit $210 million", "label": "different_event" },
+    { "id": "de009", "title_a": "Hashrate reaches record as difficulty adjusts upward", "title_b": "Regulator settles unregistered offerings lawsuit", "label": "different_event" },
+    { "id": "de010", "title_a": "Stablecoin transparency report details cash composition", "title_b": "Solana developers publish postmortem on outage", "label": "different_event" },
+
+    { "id": "de011", "title_a": "Token rallies after surprise listing announcement", "title_b": "Kraken says charter approval expands payment rails", "label": "different_event" },
+    { "id": "de012", "title_a": "Bitcoin ETF redemptions accelerate before CPI data", "title_b": "XRP lawsuit enters settlement talks stage", "label": "different_event" },
+    { "id": "de013", "title_a": "US SEC and exchange agree to civil settlement", "title_b": "Miners sell more BTC after tougher difficulty epoch", "label": "different_event" },
+    { "id": "de014", "title_a": "Liquid staking inflows boost Ethereum validator demand", "title_b": "USDT reserves show larger Treasury allocation", "label": "different_event" },
+    { "id": "de015", "title_a": "SOL chain disruption linked to transaction spam", "title_b": "Court grants extension in Ripple SEC case", "label": "different_event" },
+
+    { "id": "de016", "title_a": "Major exchange plans listing for layer2 asset", "title_b": "Bitcoin ETF net inflows top $1 billion", "label": "different_event" },
+    { "id": "de017", "title_a": "SEC enforcement action ends in $25 million settlement", "title_b": "Hashrate reaches record as difficulty adjusts upward", "label": "different_event" },
+    { "id": "de018", "title_a": "Ethereum staking participation reaches all time high", "title_b": "Exchange listing sends token up 25 percent", "label": "different_event" },
+    { "id": "de019", "title_a": "Stablecoin issuer publishes monthly reserve attestation", "title_b": "Kraken receives conditional approval for bank license", "label": "different_event" },
+    { "id": "de020", "title_a": "Bitcoin mining difficulty climbs 4 percent", "title_b": "Solana network recovers after validator restart", "label": "different_event" },
+
+    { "id": "de021", "title_a": "Ripple legal update narrows issues for trial", "title_b": "Bitcoin ETF outflows continue for fifth day", "label": "different_event" },
+    { "id": "de022", "title_a": "Bitcoin ETF daily inflows jump to $240 million", "title_b": "USDC reserve report confirms full backing", "label": "different_event" },
+    { "id": "de023", "title_a": "Coinbase announces listing for gaming token", "title_b": "Difficulty adjustment pressures smaller miners", "label": "different_event" },
+    { "id": "de024", "title_a": "ETH stakers add 2 million tokens this quarter", "title_b": "SEC Ripple dispute heads toward negotiated resolution", "label": "different_event" },
+    { "id": "de025", "title_a": "Kraken banking charter moves forward in Washington", "title_b": "Token rallies after surprise listing announcement", "label": "different_event" },
+
+    { "id": "de026", "title_a": "Spot Bitcoin ETFs record largest outflow this month", "title_b": "USDT reserves show larger Treasury allocation", "label": "different_event" },
+    { "id": "de027", "title_a": "Solana outage halts block production for 45 minutes", "title_b": "ETH staking queue grows to 400000 validators", "label": "different_event" },
+    { "id": "de028", "title_a": "US regulators approve Kraken trust bank application", "title_b": "Bitcoin mining difficulty climbs 4 percent", "label": "different_event" },
+    { "id": "de029", "title_a": "SEC reaches settlement with token issuer", "title_b": "Stablecoin transparency report details cash composition", "label": "different_event" },
+    { "id": "de030", "title_a": "Exchange listing sends token up 25 percent", "title_b": "Ripple and SEC file joint motion to pause appeal", "label": "different_event" },
+
+    { "id": "de031", "title_a": "US spot Bitcoin ETFs see net outflows on Tuesday", "title_b": "Kraken secures federal bank charter approval", "label": "different_event" },
+    { "id": "de032", "title_a": "Regulator settles unregistered offerings lawsuit", "title_b": "ETH stakers add 2 million tokens this quarter", "label": "different_event" },
+    { "id": "de033", "title_a": "Solana developers publish postmortem on outage", "title_b": "Binance lists new DeFi token on spot market", "label": "different_event" },
+    { "id": "de034", "title_a": "Mining revenue falls after difficulty increase", "title_b": "US SEC and exchange agree to civil settlement", "label": "different_event" },
+    { "id": "de035", "title_a": "Stablecoin issuer publishes monthly reserve attestation", "title_b": "Bitcoin ETF inflows rebound after three days", "label": "different_event" },
+
+    { "id": "de036", "title_a": "Ripple and SEC submit joint motion to pause appeal", "title_b": "Coinbase confirms listing of gaming token", "label": "different_event" },
+    { "id": "de037", "title_a": "Solana network resumes after validator restart", "title_b": "SEC enforcement case ends with $25 million settlement", "label": "different_event" },
+    { "id": "de038", "title_a": "Bitcoin ETF redemptions speed up before CPI data", "title_b": "Liquid staking inflows lift Ethereum validator demand", "label": "different_event" },
+    { "id": "de039", "title_a": "Issuer discloses reserve mix after audit", "title_b": "Bitcoin mining difficulty rises 4 percent", "label": "different_event" },
+    { "id": "de040", "title_a": "Kraken gets conditional approval for bank license", "title_b": "SOL chain interruption tied to transaction spam", "label": "different_event" },
+
+    { "id": "de041", "title_a": "Bitcoin ETF net inflows exceed $1 billion", "title_b": "Ripple legal update reduces issues for trial", "label": "different_event" },
+    { "id": "de042", "title_a": "ETH staking deposits climb ahead of upgrade", "title_b": "Binance adds new DeFi token to spot market", "label": "different_event" },
+    { "id": "de043", "title_a": "Stablecoin transparency report details reserve composition", "title_b": "Kraken bank charter advances in Washington", "label": "different_event" },
+    { "id": "de044", "title_a": "Difficulty adjustment squeezes smaller miners", "title_b": "Court approves extension in Ripple SEC case", "label": "different_event" },
+    { "id": "de045", "title_a": "Token jumps after surprise listing announcement", "title_b": "US spot Bitcoin ETFs log net outflows on Tuesday", "label": "different_event" },
+
+    { "id": "de046", "title_a": "USDC reserve report confirms one to one backing", "title_b": "Solana validators coordinate reboot after incident", "label": "different_event" },
+    { "id": "de047", "title_a": "SEC settles case with crypto exchange on custody rules", "title_b": "Bitcoin ETF inflows recover after three days", "label": "different_event" },
+    { "id": "de048", "title_a": "Hashrate hits record as difficulty adjusts upward", "title_b": "Coinbase announces listing for gaming token", "label": "different_event" },
+    { "id": "de049", "title_a": "Ripple legal update narrows issues for trial", "title_b": "Stablecoin issuer releases monthly reserve attestation", "label": "different_event" },
+    { "id": "de050", "title_a": "Solana developers release postmortem on outage", "title_b": "US SEC and exchange strike civil settlement", "label": "different_event" }
+  ]
+}

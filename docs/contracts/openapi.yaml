@@ -2,15 +2,19 @@ openapi: 3.1.0
 info:
   title: Sift API
   version: 0.1.0
-  summary: Future remote API for Sift
+  summary: Post-v0 hosted API outline for Sift Pro
   description: |
-    P1 remote API outline for Sift.
+    Post-v0 hosted API outline for Sift Pro.
 
     Canonical truth lives in typed JSON records.
     v0 local agent access is CLI-first.
     Human UI and Markdown projections are built on top of the same event layer.
+    The hosted service is authenticated and read-only in its first premium slice.
+    Registration and user identity are delegated to Zitadel.
 servers:
   - url: https://api.sift.local
+security:
+  - ZitadelOIDC: []
 paths:
   /v1/events:
     get:
@@ -70,6 +74,8 @@ paths:
                   next_cursor:
                     type: string
                     nullable: true
+        "401":
+          description: Missing or invalid bearer token
   /v1/events/{event_id}:
     get:
       operationId: getEvent
@@ -87,6 +93,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Event"
+        "401":
+          description: Missing or invalid bearer token
         "404":
           description: Event not found
   /v1/digests/{scope}/{window}:
@@ -126,7 +134,27 @@ paths:
                   generated_at:
                     type: string
                     format: date-time
+        "401":
+          description: Missing or invalid bearer token
+  /v1/ws:
+    get:
+      operationId: openUpdatesStream
+      summary: Open authenticated updates stream
+      description: |
+        WebSocket upgrade endpoint for low-latency event and digest notifications.
+
+        Stream messages are advisory. Clients should re-fetch canonical records
+        over REST when full event truth is required.
+      responses:
+        "101":
+          description: Switching protocols to WebSocket
+        "401":
+          description: Missing or invalid bearer token
 components:
+  securitySchemes:
+    ZitadelOIDC:
+      type: openIdConnect
+      openIdConnectUrl: https://auth.10g.dev/.well-known/openid-configuration
   schemas:
     Event:
       type: object

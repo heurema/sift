@@ -7,3 +7,12 @@ build/
 data/
 tmp/
 
+# Runtime state (SQLite + backups + run artifacts)
+state/
+
+# Derived projections
+output/
+
+# Local build artifact
+/sift
+/siftd

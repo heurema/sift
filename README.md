@@ -65,14 +65,35 @@ Sift is informed by local work and adjacent patterns:
 
 ## Current status
 
-Docs-first project.
+Docs-first project with implementation in progress.
 
-The implementation does not exist yet. This repo currently defines:
+The current build remains local-first for v0.
 
-- what the system is;
-- why it should exist;
-- what v0 must and must not do;
-- which contracts agents and future services will rely on.
+The first hosted paid slice is defined separately in [docs/plans/2026-03-07-sift-pro-mvp.md](docs/plans/2026-03-07-sift-pro-mvp.md).
+
+The narrow implementation path for that hosted slice is defined in [docs/plans/2026-03-07-sift-pro-execution-plan.md](docs/plans/2026-03-07-sift-pro-execution-plan.md).
+
+Implemented now:
+
+- Go module and single `sift` CLI scaffold;
+- SQLite bootstrap with migrations, run logging, article persistence, and event storage;
+- source registry loader and validation;
+- working `sift sources`;
+- working `sift sync` modes (`full`, `--fetch-only`, `--cluster-only`) with live feed fetch, canonical URL normalization, article dedupe, and deterministic event clustering/scoring;
+- working retrieval commands: `sift latest`, `sift search`, `sift event get`, `sift digest`;
+- digest projections published atomically to `output/digests/<scope>/<window>.{json,md}`.
+- `sift sync` in `full` and `--cluster-only` modes automatically refreshes `crypto` digests for `24h` and `7d`.
+- `sift eval clustering` precision gate on labeled title pairs (`>=100` pairs, precision `>=0.90`).
+- hosted `siftd` server scaffold with:
+  - Postgres canonical store bootstrap + migrations;
+  - in-process scheduler (`pipeline.RunSync`) over Postgres;
+  - health and readiness endpoints (`/healthz`, `/readyz`);
+  - Zitadel-protected read API (`/v1/events`, `/v1/events/{event_id}`, `/v1/digests/{scope}/{window}`);
+  - authenticated WebSocket stream endpoint (`/v1/ws`) with post-sync update notifications (`event.upserted`, `digest.updated`).
+
+Not implemented yet:
+
+- human web UI.
 
 ## Docs
 
@@ -82,3 +103,6 @@ The implementation does not exist yet. This repo currently defines:
 - [project.manifest.json](project.manifest.json)
 - [docs/README.md](docs/README.md)
 - [docs/plans/2026-03-06-sift-v0-execution-spec.md](docs/plans/2026-03-06-sift-v0-execution-spec.md)
+- [docs/plans/2026-03-07-sift-pro-mvp.md](docs/plans/2026-03-07-sift-pro-mvp.md)
+- [docs/plans/2026-03-07-sift-pro-execution-plan.md](docs/plans/2026-03-07-sift-pro-execution-plan.md)
+- [docs/plans/2026-03-07-sift-pro-slice-1-blueprint.md](docs/plans/2026-03-07-sift-pro-slice-1-blueprint.md)

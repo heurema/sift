@@ -248,6 +248,18 @@ The concrete v0 command set is fixed as:
 - `sift digest <scope>`
 - `sift sources`
 
+### `sift sync` phase flags
+
+v0 `sift sync` must support three execution modes:
+
+- full pipeline (default)
+- `--fetch-only`
+- `--cluster-only`
+
+`--fetch-only` and `--cluster-only` are mutually exclusive.
+
+Use this split to debug and rerun expensive clustering without repeating network fetch.
+
 ### `sift sources`
 
 This command exists in v0 and returns the approved registry as either:
@@ -334,3 +346,109 @@ These are intentionally not solved in v0:
 
 The implementation agent should treat these as deferred, not as missing requirements to fill in ad hoc.
 
+## 9) Hardening before implementation
+
+These constraints are mandatory for v0 implementation readiness.
+
+### 9.1 Fixed title similarity method
+
+The clustering threshold values are already fixed (`0.82`, `0.90`).
+
+The similarity method must also be fixed before coding:
+
+- normalize title to lowercase;
+- remove punctuation except numeric separators;
+- collapse whitespace;
+- compute Sorensen-Dice coefficient on character trigrams;
+- return score in `0..1`.
+
+No alternative title metric should be introduced in v0.
+
+### 9.2 Clustering eval gate
+
+Before shipping `sift sync` as stable:
+
+- maintain a labeled eval set of at least `100` title pairs;
+- include both `same_event` and `different_event` labels;
+- run eval in CI or local verification command;
+- block release if merge precision drops below `0.90`.
+
+### 9.3 Source health contract
+
+Source reliability must be explicit, not inferred from logs.
+
+Track per source:
+
+- `last_success_at`
+- `last_failure_at`
+- `consecutive_failures`
+- `last_error`
+
+Operational rule:
+
+- after `5` consecutive failures, mark source as degraded in run output;
+- do not silently hide source failures in successful run summaries.
+
+### 9.4 SQLite runtime posture
+
+SQLite remains the only authoritative store.
+
+Runtime settings for v0:
+
+- WAL mode enabled;
+- foreign keys enabled;
+- busy timeout configured;
+- sync writes are bounded transactions;
+- web and read-only CLI commands should use read-only connections where possible.
+
+### 9.5 Atomic projection publish
+
+Projection outputs in `output/` must be published atomically:
+
+- compute outputs from one run snapshot;
+- write to temporary files in the target directory;
+- rename into final path only when write is complete;
+- never read `output/` files as canonical inputs for sync.
+
+### 9.6 Migration safety
+
+Schema changes must be operationally safe in local-first setups.
+
+Rules:
+
+- keep ordered migration files;
+- maintain `schema_migrations` version tracking;
+- create DB backup before applying new migration set;
+- on migration failure, stop immediately and restore the pre-migration backup.
+
+## 10) Implementation kickoff sequence
+
+The implementation should start with one narrow vertical slice.
+
+### Slice A: foundation runtime
+
+1. Go module and single binary scaffold.
+2. SQLite open/init/migrate flow.
+3. Source registry loader from `source-registry.seed.json`.
+4. `sift sources --format json|text`.
+5. Run log table and basic run summary output.
+
+### Slice B: ingest and normalize
+
+1. RSS fetch for seed sources.
+2. Article normalization and canonical URL logic.
+3. Article dedupe by canonical URL.
+4. Persist normalized articles with rights metadata.
+
+### Slice C: event layer
+
+1. Deterministic clustering with fixed title metric.
+2. Importance/confidence/market relevance scoring.
+3. `sift latest`, `sift search`, `sift event get`.
+4. JSON/Markdown projection publish with atomic writes.
+
+### Slice D: thin UI
+
+1. `/latest` and `/events/{event_id}` on shared store.
+2. Read-only SSR templates.
+3. No auth, no write actions, no sessions.

@@ -1,7 +1,7 @@
 {
   "project_id": "sift",
   "name": "Sift",
-  "status": "docs_first",
+  "status": "implementation_in_progress",
   "thesis": "Signal over noise for humans and agents.",
   "current_scope": {
     "category": "crypto",
@@ -38,7 +38,33 @@
     "llms": "llms.txt",
     "foundation_plan": "docs/plans/2026-03-06-sift-v0-foundation.md",
     "execution_spec": "docs/plans/2026-03-06-sift-v0-execution-spec.md",
+    "sift_pro_mvp_plan": "docs/plans/2026-03-07-sift-pro-mvp.md",
+    "sift_pro_execution_plan": "docs/plans/2026-03-07-sift-pro-execution-plan.md",
+    "sift_pro_slice_1_blueprint": "docs/plans/2026-03-07-sift-pro-slice-1-blueprint.md",
     "source_registry_seed": "docs/contracts/source-registry.seed.json",
+    "clustering_eval_dataset": "docs/contracts/clustering-eval.v0.json",
     "research": "docs/research/2026-03-06-agent-native-news-landscape.md"
+  },
+  "implementation": {
+    "phase": "slice_c_hardening_eval_gate",
+    "next_phase": "sift_pro_server_slice_1_shared_runtime",
+    "runtime": "go",
+    "storage": "sqlite",
+    "planned_hosted_stack": {
+      "storage": "postgres",
+      "identity": "zitadel"
+    },
+    "implemented_commands": [
+      "sift sources",
+      "sift sync",
+      "sift sync --fetch-only",
+      "sift sync --cluster-only",
+      "sift latest",
+      "sift search",
+      "sift event get <event_id>",
+      "sift digest <scope>",
+      "sift eval clustering"
+    ],
+    "entrypoint": "cmd/sift/main.go"
   }
 }
