@@ -727,6 +727,16 @@ func (s *Store) ApplyRetention(ctx context.Context, cutoff time.Time) error {
 
 	if _, err := tx.ExecContext(
 		ctx,
+		`DELETE FROM events
+		WHERE NOT EXISTS (
+			SELECT 1 FROM event_articles WHERE event_articles.event_id = events.event_id
+		)`,
+	); err != nil {
+		return fmt.Errorf("delete orphaned events: %w", err)
+	}
+
+	if _, err := tx.ExecContext(
+		ctx,
 		`DELETE FROM runs WHERE finished_at < ?`,
 		cutoffValue,
 	); err != nil {
