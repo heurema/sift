@@ -224,6 +224,88 @@ func TestRunSyncFetchOnlyPrefersDeterministicDuplicateWinner(t *testing.T) {
 	}
 }
 
+func TestRunSyncClusterOnlyAppliesRetentionBeforeRebuild(t *testing.T) {
+	t.Parallel()
+
+	ctx := context.Background()
+	now := time.Date(2026, 3, 8, 10, 0, 0, 0, time.UTC)
+	oldNow := now.Add(-45 * 24 * time.Hour)
+
+	registryPath := filepath.Join(t.TempDir(), "registry.json")
+	writeRegistryFile(t, registryPath)
+
+	stateDir := filepath.Join(t.TempDir(), "state")
+	store, err := sqlite.OpenStateStore(ctx, stateDir)
+	if err != nil {
+		t.Fatalf("open state store: %v", err)
+	}
+	defer store.Close()
+
+	_, err = RunSync(ctx, store, Options{
+		Mode:         ModeFull,
+		RegistryPath: registryPath,
+		OutputDir:    filepath.Join(t.TempDir(), "output-initial"),
+		Now:          func() time.Time { return oldNow },
+		NewRunID: func(_ time.Time) (string, error) {
+			return "run_old_full", nil
+		},
+		FetchFeedItems: func(_ context.Context, _ *http.Client, _ source.Source) ([]ingest.FeedItem, error) {
+			return []ingest.FeedItem{
+				{
+					URL:       "https://example.com/news/old",
+					Title:     "Old event that should expire",
+					Published: oldNow,
+				},
+			}, nil
+		},
+	})
+	if err != nil {
+		t.Fatalf("initial RunSync returned error: %v", err)
+	}
+
+	initialEvents, err := store.ListEvents(ctx)
+	if err != nil {
+		t.Fatalf("ListEvents after initial run returned error: %v", err)
+	}
+	if len(initialEvents) != 1 {
+		t.Fatalf("unexpected initial event count: %d", len(initialEvents))
+	}
+
+	summary, err := RunSync(ctx, store, Options{
+		Mode:            ModeClusterOnly,
+		RegistryPath:    registryPath,
+		OutputDir:       filepath.Join(t.TempDir(), "output-retention"),
+		RetentionWindow: 30 * 24 * time.Hour,
+		Now:             func() time.Time { return now },
+		NewRunID: func(_ time.Time) (string, error) {
+			return "run_retention_cluster", nil
+		},
+	})
+	if err != nil {
+		t.Fatalf("retention RunSync returned error: %v", err)
+	}
+
+	if summary.EventsRebuilt != 0 {
+		t.Fatalf("expected 0 events rebuilt after retention, got %d", summary.EventsRebuilt)
+	}
+
+	articles, err := store.ListArticlesForClustering(ctx)
+	if err != nil {
+		t.Fatalf("ListArticlesForClustering returned error: %v", err)
+	}
+	if len(articles) != 0 {
+		t.Fatalf("expected retained article set to be empty, got %d", len(articles))
+	}
+
+	events, err := store.ListEvents(ctx)
+	if err != nil {
+		t.Fatalf("ListEvents returned error: %v", err)
+	}
+	if len(events) != 0 {
+		t.Fatalf("expected retained event set to be empty, got %d", len(events))
+	}
+}
+
 func writeRegistryFile(t *testing.T, path string) {
 	t.Helper()
 

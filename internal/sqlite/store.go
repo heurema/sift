@@ -697,6 +697,59 @@ func (s *Store) ListEvents(ctx context.Context) ([]event.Record, error) {
 	return events, nil
 }
 
+func (s *Store) ApplyRetention(ctx context.Context, cutoff time.Time) error {
+	cutoffValue := cutoff.UTC().Format(time.RFC3339)
+
+	tx, err := s.db.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("begin retention transaction: %w", err)
+	}
+	defer tx.Rollback()
+
+	if _, err := tx.ExecContext(
+		ctx,
+		`DELETE FROM event_articles
+		WHERE article_id IN (
+			SELECT article_id FROM articles WHERE published_at < ?
+		)`,
+		cutoffValue,
+	); err != nil {
+		return fmt.Errorf("delete retained event articles: %w", err)
+	}
+
+	if _, err := tx.ExecContext(
+		ctx,
+		`DELETE FROM articles WHERE published_at < ?`,
+		cutoffValue,
+	); err != nil {
+		return fmt.Errorf("delete retained articles: %w", err)
+	}
+
+	if _, err := tx.ExecContext(
+		ctx,
+		`DELETE FROM events
+		WHERE NOT EXISTS (
+			SELECT 1 FROM event_articles WHERE event_articles.event_id = events.event_id
+		)`,
+	); err != nil {
+		return fmt.Errorf("delete orphaned events: %w", err)
+	}
+
+	if _, err := tx.ExecContext(
+		ctx,
+		`DELETE FROM runs WHERE finished_at < ?`,
+		cutoffValue,
+	); err != nil {
+		return fmt.Errorf("delete retained runs: %w", err)
+	}
+
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("commit retention transaction: %w", err)
+	}
+
+	return nil
+}
+
 func (s *Store) GetEvent(ctx context.Context, eventID string) (event.Record, bool, error) {
 	var payload string
 	err := s.db.QueryRowContext(

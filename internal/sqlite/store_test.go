@@ -280,3 +280,104 @@ func TestReopenDatabaseKeepsExistingHandleWhenPragmasFail(t *testing.T) {
 		t.Fatalf("store should keep original writable handle after reopen failure, got error: %v", err)
 	}
 }
+
+func TestApplyRetentionRemovesOrphanedEvents(t *testing.T) {
+	t.Parallel()
+
+	ctx := context.Background()
+	dbPath := filepath.Join(t.TempDir(), "sift.db")
+
+	store, err := Open(dbPath)
+	if err != nil {
+		t.Fatalf("Open returned error: %v", err)
+	}
+	defer store.Close()
+
+	if err := store.Migrate(ctx); err != nil {
+		t.Fatalf("Migrate returned error: %v", err)
+	}
+
+	registry := source.Registry{
+		Version:   1,
+		Category:  "crypto",
+		UpdatedAt: "2026-03-08T10:00:00Z",
+		Sources: []source.Source{
+			{
+				SourceID:             "retention_source",
+				SourceName:           "Retention Source",
+				SourceClass:          "media",
+				AccessMethod:         "rss",
+				URL:                  "https://example.com/retention",
+				SourceWeight:         0.8,
+				RightsMode:           "metadata_plus_excerpt",
+				ExcerptAllowed:       true,
+				SummaryAllowed:       true,
+				DefaultEditorialType: "report",
+				ReviewedAt:           "2026-03-08",
+				Notes:                "test",
+			},
+		},
+	}
+	if _, err := store.UpsertSources(ctx, registry); err != nil {
+		t.Fatalf("UpsertSources returned error: %v", err)
+	}
+
+	now := time.Date(2026, 3, 8, 10, 0, 0, 0, time.UTC)
+	oldPublished := now.Add(-45 * 24 * time.Hour)
+	rec, err := article.BuildRecord(article.Candidate{
+		SourceID:      "retention_source",
+		SourceURL:     "https://example.com/news/old",
+		Title:         "Old retained article",
+		PublishedAt:   oldPublished,
+		EditorialType: "report",
+		RightsMode:    "metadata_plus_excerpt",
+	}, oldPublished)
+	if err != nil {
+		t.Fatalf("BuildRecord returned error: %v", err)
+	}
+
+	if _, _, err := store.UpsertArticles(ctx, []article.Record{rec}); err != nil {
+		t.Fatalf("UpsertArticles returned error: %v", err)
+	}
+
+	articleInputs, err := store.ListArticlesForClustering(ctx)
+	if err != nil {
+		t.Fatalf("ListArticlesForClustering returned error: %v", err)
+	}
+	events, err := event.BuildRecords(articleInputs, now)
+	if err != nil {
+		t.Fatalf("BuildRecords returned error: %v", err)
+	}
+	if err := store.ReplaceEvents(ctx, events); err != nil {
+		t.Fatalf("ReplaceEvents returned error: %v", err)
+	}
+
+	initialEvents, err := store.ListEvents(ctx)
+	if err != nil {
+		t.Fatalf("ListEvents returned error: %v", err)
+	}
+	if len(initialEvents) != 1 {
+		t.Fatalf("unexpected initial events count: %d", len(initialEvents))
+	}
+
+	cutoff := now.Add(-30 * 24 * time.Hour)
+	if err := store.ApplyRetention(ctx, cutoff); err != nil {
+		t.Fatalf("ApplyRetention returned error: %v", err)
+	}
+
+	remainingArticles, err := store.ListArticlesForClustering(ctx)
+	if err != nil {
+		t.Fatalf("ListArticlesForClustering after retention returned error: %v", err)
+	}
+	if len(remainingArticles) != 0 {
+		t.Fatalf("expected no remaining articles, got %d", len(remainingArticles))
+	}
+
+	remainingEvents, err := store.ListEvents(ctx)
+	if err != nil {
+		t.Fatalf("ListEvents after retention returned error: %v", err)
+	}
+	if len(remainingEvents) != 0 {
+		t.Fatalf("expected no remaining events, got %d", len(remainingEvents))
+	}
+}

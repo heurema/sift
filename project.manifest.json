@@ -41,6 +41,7 @@
     "sift_pro_mvp_plan": "docs/plans/2026-03-07-sift-pro-mvp.md",
     "sift_pro_execution_plan": "docs/plans/2026-03-07-sift-pro-execution-plan.md",
     "sift_pro_slice_1_blueprint": "docs/plans/2026-03-07-sift-pro-slice-1-blueprint.md",
+    "siftd_runbook": "docs/runbooks/siftd.md",
     "source_registry_seed": "docs/contracts/source-registry.seed.json",
     "clustering_eval_dataset": "docs/contracts/clustering-eval.v0.json",
     "research": "docs/research/2026-03-06-agent-native-news-landscape.md"

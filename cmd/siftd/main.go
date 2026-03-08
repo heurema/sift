@@ -23,6 +23,7 @@ const (
 	defaultOutputDir    = "output"
 	defaultSyncInterval = 5 * time.Minute
 	defaultSyncTimeout  = 4 * time.Minute
+	defaultRetention    = 30 * 24 * time.Hour
 )
 
 type config struct {
@@ -32,6 +33,7 @@ type config struct {
 	OutputDir        string
 	SyncInterval     time.Duration
 	SyncTimeout      time.Duration
+	RetentionWindow  time.Duration
 	SyncOnStart      bool
 	ZitadelIssuer    string
 	ZitadelAudience  string
@@ -92,7 +94,12 @@ func run(ctx context.Context) error {
 		close(serverErr)
 	}()
 
-	fmt.Printf("siftd started: addr=%s sync_interval=%s\n", cfg.ListenAddr, cfg.SyncInterval)
+	fmt.Printf(
+		"siftd started: addr=%s sync_interval=%s retention=%s\n",
+		cfg.ListenAddr,
+		cfg.SyncInterval,
+		cfg.RetentionWindow,
+	)
 
 	select {
 	case <-ctx.Done():
@@ -120,9 +127,10 @@ func runScheduler(ctx context.Context, store *postgres.Store, api *hosted.Server
 		defer cancel()
 
 		summary, err := pipeline.RunSync(syncCtx, store, pipeline.Options{
-			Mode:         pipeline.ModeFull,
-			RegistryPath: cfg.RegistryPath,
-			OutputDir:    cfg.OutputDir,
+			Mode:            pipeline.ModeFull,
+			RegistryPath:    cfg.RegistryPath,
+			OutputDir:       cfg.OutputDir,
+			RetentionWindow: cfg.RetentionWindow,
 		})
 		if err != nil {
 			if errors.Is(err, context.Canceled) && ctx.Err() != nil {
@@ -172,6 +180,11 @@ func loadConfigFromEnv() (config, error) {
 		return config{}, err
 	}
 
+	retentionWindow, err := parseDurationEnv("SIFTD_RETENTION", defaultRetention)
+	if err != nil {
+		return config{}, err
+	}
+
 	syncOnStart, err := parseBoolEnv("SIFTD_SYNC_ON_START", true)
 	if err != nil {
 		return config{}, err
@@ -184,6 +197,7 @@ func loadConfigFromEnv() (config, error) {
 		OutputDir:        envOrDefault("SIFTD_OUTPUT_DIR", defaultOutputDir),
 		SyncInterval:     syncInterval,
 		SyncTimeout:      syncTimeout,
+		RetentionWindow:  retentionWindow,
 		SyncOnStart:      syncOnStart,
 		ZitadelIssuer:    strings.TrimSpace(os.Getenv("SIFTD_ZITADEL_ISSUER")),
 		ZitadelAudience:  strings.TrimSpace(os.Getenv("SIFTD_ZITADEL_AUDIENCE")),
@@ -204,6 +218,9 @@ func loadConfigFromEnv() (config, error) {
 	}
 	if cfg.SyncInterval <= 0 {
 		return config{}, fmt.Errorf("SIFTD_SYNC_INTERVAL must be > 0")
+	}
+	if cfg.RetentionWindow < 0 {
+		return config{}, fmt.Errorf("SIFTD_RETENTION must be >= 0")
 	}
 
 	return cfg, nil
