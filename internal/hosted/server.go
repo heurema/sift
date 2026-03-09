@@ -429,6 +429,8 @@ func (s *Server) withCORS(next http.Handler) http.Handler {
 			return
 		}
 
+		applyCORSVaryHeaders(w.Header())
+
 		origin, ok := s.allowedOrigin(r.Header.Get("Origin"), r.Host)
 		if strings.TrimSpace(r.Header.Get("Origin")) != "" && !ok {
 			writeJSONError(w, http.StatusForbidden, "origin not allowed")
@@ -469,6 +471,9 @@ func applyCORSHeaders(header http.Header, origin string) {
 	header.Set("Access-Control-Allow-Methods", "GET, OPTIONS")
 	header.Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 	header.Set("Access-Control-Max-Age", "600")
+}
+
+func applyCORSVaryHeaders(header http.Header) {
 	header.Add("Vary", "Origin")
 	header.Add("Vary", "Access-Control-Request-Method")
 	header.Add("Vary", "Access-Control-Request-Headers")

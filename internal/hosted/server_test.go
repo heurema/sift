@@ -211,6 +211,74 @@ func TestListEventsAddsCORSHeadersForAllowedOrigin(t *testing.T) {
 	}
 }
 
+func TestRESTAddsVaryHeadersWithoutOrigin(t *testing.T) {
+	t.Parallel()
+
+	srv, err := New(Options{
+		Store: &fakeStore{
+			events: []event.Record{{EventID: "evt_btc", Category: "crypto", Title: "BTC event"}},
+		},
+		Validator: fakeValidator{
+			validToken: "token123",
+		},
+		OutputDir: "output",
+		Now:       fixedNow,
+	})
+	if err != nil {
+		t.Fatalf("New returned error: %v", err)
+	}
+
+	req := httptest.NewRequest(http.MethodGet, "/v1/events", nil)
+	req.Header.Set("Authorization", "Bearer token123")
+	recorder := httptest.NewRecorder()
+	srv.Handler().ServeHTTP(recorder, req)
+
+	if recorder.Code != http.StatusOK {
+		t.Fatalf("unexpected status: %d body=%s", recorder.Code, recorder.Body.String())
+	}
+	if recorder.Header().Get("Access-Control-Allow-Origin") != "" {
+		t.Fatalf("unexpected allow origin header: %q", recorder.Header().Get("Access-Control-Allow-Origin"))
+	}
+
+	vary := recorder.Header().Values("Vary")
+	for _, expected := range []string{"Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers"} {
+		if !containsString(vary, expected) {
+			t.Fatalf("expected Vary to contain %q, got %q", expected, vary)
+		}
+	}
+}
+
+func TestListEventsAllowsSameOriginFallbackWhenAllowlistEmpty(t *testing.T) {
+	t.Parallel()
+
+	srv, err := New(Options{
+		Store: &fakeStore{
+			events: []event.Record{{EventID: "evt_btc", Category: "crypto", Title: "BTC event"}},
+		},
+		Validator: fakeValidator{
+			validToken: "token123",
+		},
+		OutputDir: "output",
+		Now:       fixedNow,
+	})
+	if err != nil {
+		t.Fatalf("New returned error: %v", err)
+	}
+
+	req := httptest.NewRequest(http.MethodGet, "https://api.sift.local/v1/events", nil)
+	req.Header.Set("Authorization", "Bearer token123")
+	req.Header.Set("Origin", "https://api.sift.local")
+	recorder := httptest.NewRecorder()
+	srv.Handler().ServeHTTP(recorder, req)
+
+	if recorder.Code != http.StatusOK {
+		t.Fatalf("unexpected status: %d body=%s", recorder.Code, recorder.Body.String())
+	}
+	if recorder.Header().Get("Access-Control-Allow-Origin") != "https://api.sift.local" {
+		t.Fatalf("unexpected allow origin header: %q", recorder.Header().Get("Access-Control-Allow-Origin"))
+	}
+}
+
 func TestRESTPreflightAllowsConfiguredOrigin(t *testing.T) {
 	t.Parallel()
 
@@ -718,4 +786,13 @@ func TestWebSocketRejectsMissingOriginWhenAllowlistConfigured(t *testing.T) {
 
 func fixedNow() time.Time {
 	return time.Date(2026, 3, 8, 10, 0, 0, 0, time.UTC)
+}
+
+func containsString(values []string, needle string) bool {
+	for _, value := range values {
+		if value == needle {
+			return true
+		}
+	}
+	return false
 }

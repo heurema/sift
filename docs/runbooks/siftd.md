@@ -210,6 +210,7 @@ If browser WebSocket connection fails:
 - confirm non-browser clients use `Authorization: Bearer <token>` if they do not support subprotocol auth;
 - confirm request `Origin` matches `SIFTD_ALLOWED_ORIGINS`;
 - confirm the reverse proxy forwards the WebSocket upgrade headers unchanged.
+- scrub or disable logging of `Sec-WebSocket-Protocol` in the reverse proxy, because `bearer.<token>` can otherwise land in access/proxy logs.
 
 If browser REST requests fail with CORS errors:
 
