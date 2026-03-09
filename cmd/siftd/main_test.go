@@ -10,7 +10,7 @@ func TestLoadConfigFromEnv(t *testing.T) {
 	t.Setenv("SIFTD_SYNC_TIMEOUT", "30s")
 	t.Setenv("SIFTD_RETENTION", "720h")
 	t.Setenv("SIFTD_SYNC_ON_START", "false")
-	t.Setenv("SIFTD_WS_ALLOWED_ORIGINS", "https://sift.local, https://console.sift.local")
+	t.Setenv("SIFTD_ALLOWED_ORIGINS", "https://sift.local, https://console.sift.local")
 
 	cfg, err := loadConfigFromEnv()
 	if err != nil {
@@ -29,11 +29,28 @@ func TestLoadConfigFromEnv(t *testing.T) {
 	if cfg.RetentionWindow.String() != "720h0m0s" {
 		t.Fatalf("unexpected retention window: %s", cfg.RetentionWindow)
 	}
-	if len(cfg.WSAllowedOrigins) != 2 {
-		t.Fatalf("unexpected ws allowed origins count: %d", len(cfg.WSAllowedOrigins))
+	if len(cfg.AllowedOrigins) != 2 {
+		t.Fatalf("unexpected allowed origins count: %d", len(cfg.AllowedOrigins))
 	}
-	if cfg.WSAllowedOrigins[0] != "https://sift.local" {
-		t.Fatalf("unexpected first ws allowed origin: %s", cfg.WSAllowedOrigins[0])
+	if cfg.AllowedOrigins[0] != "https://sift.local" {
+		t.Fatalf("unexpected first allowed origin: %s", cfg.AllowedOrigins[0])
+	}
+}
+
+func TestLoadConfigFromEnvFallsBackToLegacyWSOrigins(t *testing.T) {
+	t.Setenv("SIFTD_POSTGRES_DSN", "postgres://user:pass@localhost:5432/sift?sslmode=disable")
+	t.Setenv("SIFTD_ZITADEL_ISSUER", "https://auth.example.com")
+	t.Setenv("SIFTD_ZITADEL_AUDIENCE", "audience")
+	t.Setenv("SIFTD_ALLOWED_ORIGINS", "")
+	t.Setenv("SIFTD_WS_ALLOWED_ORIGINS", "https://legacy.sift.local")
+
+	cfg, err := loadConfigFromEnv()
+	if err != nil {
+		t.Fatalf("loadConfigFromEnv returned error: %v", err)
+	}
+
+	if len(cfg.AllowedOrigins) != 1 || cfg.AllowedOrigins[0] != "https://legacy.sift.local" {
+		t.Fatalf("unexpected legacy fallback origins: %#v", cfg.AllowedOrigins)
 	}
 }
 

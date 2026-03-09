@@ -179,6 +179,167 @@ func TestListEventsFiltersAndLimit(t *testing.T) {
 	}
 }
 
+func TestListEventsAddsCORSHeadersForAllowedOrigin(t *testing.T) {
+	t.Parallel()
+
+	srv, err := New(Options{
+		Store: &fakeStore{
+			events: []event.Record{{EventID: "evt_btc", Category: "crypto", Title: "BTC event"}},
+		},
+		Validator: fakeValidator{
+			validToken: "token123",
+		},
+		OutputDir:             "output",
+		AllowedBrowserOrigins: []string{"https://skill7.dev"},
+		Now:                   fixedNow,
+	})
+	if err != nil {
+		t.Fatalf("New returned error: %v", err)
+	}
+
+	req := httptest.NewRequest(http.MethodGet, "/v1/events", nil)
+	req.Header.Set("Authorization", "Bearer token123")
+	req.Header.Set("Origin", "https://skill7.dev")
+	recorder := httptest.NewRecorder()
+	srv.Handler().ServeHTTP(recorder, req)
+
+	if recorder.Code != http.StatusOK {
+		t.Fatalf("unexpected status: %d body=%s", recorder.Code, recorder.Body.String())
+	}
+	if recorder.Header().Get("Access-Control-Allow-Origin") != "https://skill7.dev" {
+		t.Fatalf("unexpected allow origin header: %q", recorder.Header().Get("Access-Control-Allow-Origin"))
+	}
+}
+
+func TestRESTAddsVaryHeadersWithoutOrigin(t *testing.T) {
+	t.Parallel()
+
+	srv, err := New(Options{
+		Store: &fakeStore{
+			events: []event.Record{{EventID: "evt_btc", Category: "crypto", Title: "BTC event"}},
+		},
+		Validator: fakeValidator{
+			validToken: "token123",
+		},
+		OutputDir: "output",
+		Now:       fixedNow,
+	})
+	if err != nil {
+		t.Fatalf("New returned error: %v", err)
+	}
+
+	req := httptest.NewRequest(http.MethodGet, "/v1/events", nil)
+	req.Header.Set("Authorization", "Bearer token123")
+	recorder := httptest.NewRecorder()
+	srv.Handler().ServeHTTP(recorder, req)
+
+	if recorder.Code != http.StatusOK {
+		t.Fatalf("unexpected status: %d body=%s", recorder.Code, recorder.Body.String())
+	}
+	if recorder.Header().Get("Access-Control-Allow-Origin") != "" {
+		t.Fatalf("unexpected allow origin header: %q", recorder.Header().Get("Access-Control-Allow-Origin"))
+	}
+
+	vary := recorder.Header().Values("Vary")
+	for _, expected := range []string{"Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers"} {
+		if !containsString(vary, expected) {
+			t.Fatalf("expected Vary to contain %q, got %q", expected, vary)
+		}
+	}
+}
+
+func TestListEventsAllowsSameOriginFallbackWhenAllowlistEmpty(t *testing.T) {
+	t.Parallel()
+
+	srv, err := New(Options{
+		Store: &fakeStore{
+			events: []event.Record{{EventID: "evt_btc", Category: "crypto", Title: "BTC event"}},
+		},
+		Validator: fakeValidator{
+			validToken: "token123",
+		},
+		OutputDir: "output",
+		Now:       fixedNow,
+	})
+	if err != nil {
+		t.Fatalf("New returned error: %v", err)
+	}
+
+	req := httptest.NewRequest(http.MethodGet, "https://api.sift.local/v1/events", nil)
+	req.Header.Set("Authorization", "Bearer token123")
+	req.Header.Set("Origin", "https://api.sift.local")
+	recorder := httptest.NewRecorder()
+	srv.Handler().ServeHTTP(recorder, req)
+
+	if recorder.Code != http.StatusOK {
+		t.Fatalf("unexpected status: %d body=%s", recorder.Code, recorder.Body.String())
+	}
+	if recorder.Header().Get("Access-Control-Allow-Origin") != "https://api.sift.local" {
+		t.Fatalf("unexpected allow origin header: %q", recorder.Header().Get("Access-Control-Allow-Origin"))
+	}
+}
+
+func TestRESTPreflightAllowsConfiguredOrigin(t *testing.T) {
+	t.Parallel()
+
+	srv, err := New(Options{
+		Store:     &fakeStore{},
+		Validator: fakeValidator{},
+		OutputDir: "output",
+		AllowedBrowserOrigins: []string{
+			"https://skill7.dev",
+		},
+		Now: fixedNow,
+	})
+	if err != nil {
+		t.Fatalf("New returned error: %v", err)
+	}
+
+	req := httptest.NewRequest(http.MethodOptions, "/v1/events", nil)
+	req.Header.Set("Origin", "https://skill7.dev")
+	req.Header.Set("Access-Control-Request-Method", http.MethodGet)
+	req.Header.Set("Access-Control-Request-Headers", "Authorization")
+	recorder := httptest.NewRecorder()
+	srv.Handler().ServeHTTP(recorder, req)
+
+	if recorder.Code != http.StatusNoContent {
+		t.Fatalf("unexpected status: %d body=%s", recorder.Code, recorder.Body.String())
+	}
+	if recorder.Header().Get("Access-Control-Allow-Origin") != "https://skill7.dev" {
+		t.Fatalf("unexpected allow origin header: %q", recorder.Header().Get("Access-Control-Allow-Origin"))
+	}
+	if !strings.Contains(recorder.Header().Get("Access-Control-Allow-Headers"), "Authorization") {
+		t.Fatalf("unexpected allow headers: %q", recorder.Header().Get("Access-Control-Allow-Headers"))
+	}
+}
+
+func TestRESTPreflightRejectsDisallowedOrigin(t *testing.T) {
+	t.Parallel()
+
+	srv, err := New(Options{
+		Store:     &fakeStore{},
+		Validator: fakeValidator{},
+		OutputDir: "output",
+		AllowedBrowserOrigins: []string{
+			"https://skill7.dev",
+		},
+		Now: fixedNow,
+	})
+	if err != nil {
+		t.Fatalf("New returned error: %v", err)
+	}
+
+	req := httptest.NewRequest(http.MethodOptions, "/v1/events", nil)
+	req.Header.Set("Origin", "https://evil.example")
+	req.Header.Set("Access-Control-Request-Method", http.MethodGet)
+	recorder := httptest.NewRecorder()
+	srv.Handler().ServeHTTP(recorder, req)
+
+	if recorder.Code != http.StatusForbidden {
+		t.Fatalf("unexpected status: %d body=%s", recorder.Code, recorder.Body.String())
+	}
+}
+
 func TestGetEventNotFound(t *testing.T) {
 	t.Parallel()
 
@@ -484,6 +645,65 @@ func TestWebSocketAllowsConfiguredOrigin(t *testing.T) {
 	}
 }
 
+func TestWebSocketAllowsSubprotocolTokenAuthentication(t *testing.T) {
+	t.Parallel()
+
+	srv, err := New(Options{
+		Store: &fakeStore{},
+		Validator: fakeValidator{
+			validToken: "token123",
+		},
+		OutputDir:             "output",
+		AllowedBrowserOrigins: []string{"https://skill7.dev"},
+		Now:                   fixedNow,
+	})
+	if err != nil {
+		t.Fatalf("New returned error: %v", err)
+	}
+
+	httpServer := httptest.NewServer(srv.Handler())
+	defer httpServer.Close()
+
+	wsURL, err := url.Parse(httpServer.URL)
+	if err != nil {
+		t.Fatalf("parse test server url: %v", err)
+	}
+	wsURL.Scheme = "ws"
+	wsURL.Path = "/v1/ws"
+
+	header := http.Header{}
+	header.Set("Origin", "https://skill7.dev")
+
+	dialer := websocket.Dialer{
+		Subprotocols: []string{
+			webSocketProtocol,
+			webSocketBearerPrefix + "token123",
+		},
+	}
+	conn, _, err := dialer.Dial(wsURL.String(), header)
+	if err != nil {
+		t.Fatalf("dial websocket with subprotocol token: %v", err)
+	}
+	defer conn.Close()
+
+	if conn.Subprotocol() != webSocketProtocol {
+		t.Fatalf("unexpected negotiated subprotocol: %q", conn.Subprotocol())
+	}
+
+	_, message, err := conn.ReadMessage()
+	if err != nil {
+		t.Fatalf("read connected message: %v", err)
+	}
+
+	var connected streamEnvelope
+	if err := json.Unmarshal(message, &connected); err != nil {
+		t.Fatalf("decode connected message: %v", err)
+	}
+	if connected.Type != "connected" {
+		t.Fatalf("unexpected connected message type: %s", connected.Type)
+	}
+}
+
 func TestWebSocketRejectsQueryTokenAuthentication(t *testing.T) {
 	t.Parallel()
 
@@ -566,4 +786,13 @@ func TestWebSocketRejectsMissingOriginWhenAllowlistConfigured(t *testing.T) {
 
 func fixedNow() time.Time {
 	return time.Date(2026, 3, 8, 10, 0, 0, 0, time.UTC)
+}
+
+func containsString(values []string, needle string) bool {
+	for _, value := range values {
+		if value == needle {
+			return true
+		}
+	}
+	return false
 }

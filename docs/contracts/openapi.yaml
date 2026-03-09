@@ -145,6 +145,10 @@ paths:
 
         Stream messages are advisory. Clients should re-fetch canonical records
         over REST when full event truth is required.
+
+        Non-browser clients may authenticate with `Authorization: Bearer <token>`.
+        Browser clients should use `Sec-WebSocket-Protocol: sift.v1, bearer.<token>`
+        so the server can validate the bearer token without exposing it in the URL.
       responses:
         "101":
           description: Switching protocols to WebSocket

@@ -21,8 +21,10 @@ import (
 )
 
 const (
-	defaultListLimit = 20
-	maxListLimit     = 100
+	defaultListLimit      = 20
+	maxListLimit          = 100
+	webSocketProtocol     = "sift.v1"
+	webSocketBearerPrefix = "bearer."
 )
 
 type EventStore interface {
@@ -35,6 +37,7 @@ type Options struct {
 	Store                   EventStore
 	Validator               zitadel.Validator
 	OutputDir               string
+	AllowedBrowserOrigins   []string
 	AllowedWebSocketOrigins []string
 	Now                     func() time.Time
 }
@@ -55,7 +58,7 @@ type Server struct {
 	clients  map[*wsClient]struct{}
 	upgrader websocket.Upgrader
 
-	allowedWebSocketOrigins map[string]struct{}
+	allowedBrowserOrigins map[string]struct{}
 }
 
 type wsClient struct {
@@ -101,25 +104,28 @@ func New(options Options) (*Server, error) {
 		now = func() time.Time { return time.Now().UTC() }
 	}
 
-	allowedOrigins := make(map[string]struct{}, len(options.AllowedWebSocketOrigins))
-	for _, rawOrigin := range options.AllowedWebSocketOrigins {
+	allowedOrigins := make(map[string]struct{}, len(options.AllowedBrowserOrigins)+len(options.AllowedWebSocketOrigins))
+	for _, rawOrigin := range append(options.AllowedBrowserOrigins, options.AllowedWebSocketOrigins...) {
 		origin, err := normalizeOrigin(rawOrigin)
 		if err != nil {
-			return nil, fmt.Errorf("invalid websocket allowed origin %q: %w", rawOrigin, err)
+			return nil, fmt.Errorf("invalid allowed origin %q: %w", rawOrigin, err)
 		}
 		allowedOrigins[origin] = struct{}{}
 	}
 
 	server := &Server{
-		store:                   options.Store,
-		validator:               options.Validator,
-		outputDir:               outputDir,
-		now:                     now,
-		clients:                 make(map[*wsClient]struct{}),
-		allowedWebSocketOrigins: allowedOrigins,
+		store:                 options.Store,
+		validator:             options.Validator,
+		outputDir:             outputDir,
+		now:                   now,
+		clients:               make(map[*wsClient]struct{}),
+		allowedBrowserOrigins: allowedOrigins,
 	}
 	server.upgrader = websocket.Upgrader{
 		CheckOrigin: server.checkWebSocketOrigin,
+		Subprotocols: []string{
+			webSocketProtocol,
+		},
 	}
 
 	return server, nil
@@ -146,28 +152,33 @@ func normalizeOrigin(raw string) (string, error) {
 }
 
 func (s *Server) checkWebSocketOrigin(r *http.Request) bool {
-	originHeader := strings.TrimSpace(r.Header.Get("Origin"))
+	_, ok := s.allowedOrigin(r.Header.Get("Origin"), r.Host)
+	return ok
+}
+
+func (s *Server) allowedOrigin(rawOrigin, requestHost string) (string, bool) {
+	originHeader := strings.TrimSpace(rawOrigin)
 	if originHeader == "" {
 		// If an explicit allowlist is configured, require Origin header presence.
-		return len(s.allowedWebSocketOrigins) == 0
+		return "", len(s.allowedBrowserOrigins) == 0
 	}
 
 	origin, err := normalizeOrigin(originHeader)
 	if err != nil {
-		return false
+		return "", false
 	}
 
-	if len(s.allowedWebSocketOrigins) > 0 {
-		_, ok := s.allowedWebSocketOrigins[origin]
-		return ok
+	if len(s.allowedBrowserOrigins) > 0 {
+		_, ok := s.allowedBrowserOrigins[origin]
+		return origin, ok
 	}
 
 	originURL, err := url.Parse(origin)
 	if err != nil {
-		return false
+		return "", false
 	}
 
-	return strings.EqualFold(originURL.Host, r.Host)
+	return origin, strings.EqualFold(originURL.Host, requestHost)
 }
 
 func (s *Server) Handler() http.Handler {
@@ -178,7 +189,7 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/v1/events/", s.requireAuth(s.handleGetEvent))
 	mux.HandleFunc("/v1/digests/", s.requireAuth(s.handleGetDigest))
 	mux.HandleFunc("/v1/ws", s.requireAuth(s.handleWebSocket))
-	return mux
+	return s.withCORS(mux)
 }
 
 func (s *Server) MarkSyncSuccess(runID string, at time.Time) {
@@ -411,6 +422,63 @@ func (s *Server) handleWebSocket(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (s *Server) withCORS(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !isRESTAPIPath(r.URL.Path) {
+			next.ServeHTTP(w, r)
+			return
+		}
+
+		applyCORSVaryHeaders(w.Header())
+
+		origin, ok := s.allowedOrigin(r.Header.Get("Origin"), r.Host)
+		if strings.TrimSpace(r.Header.Get("Origin")) != "" && !ok {
+			writeJSONError(w, http.StatusForbidden, "origin not allowed")
+			return
+		}
+
+		if ok && origin != "" {
+			applyCORSHeaders(w.Header(), origin)
+		}
+
+		if isPreflightRequest(r) {
+			if !ok || origin == "" {
+				writeJSONError(w, http.StatusForbidden, "origin not allowed")
+				return
+			}
+			if !strings.EqualFold(strings.TrimSpace(r.Header.Get("Access-Control-Request-Method")), http.MethodGet) {
+				writeJSONError(w, http.StatusMethodNotAllowed, "method not allowed")
+				return
+			}
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
+func isRESTAPIPath(path string) bool {
+	return path == "/v1/events" || strings.HasPrefix(path, "/v1/events/") || strings.HasPrefix(path, "/v1/digests/")
+}
+
+func isPreflightRequest(r *http.Request) bool {
+	return r.Method == http.MethodOptions && strings.TrimSpace(r.Header.Get("Access-Control-Request-Method")) != ""
+}
+
+func applyCORSHeaders(header http.Header, origin string) {
+	header.Set("Access-Control-Allow-Origin", origin)
+	header.Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+	header.Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+	header.Set("Access-Control-Max-Age", "600")
+}
+
+func applyCORSVaryHeaders(header http.Header) {
+	header.Add("Vary", "Origin")
+	header.Add("Vary", "Access-Control-Request-Method")
+	header.Add("Vary", "Access-Control-Request-Headers")
+}
+
 func (s *Server) requireAuth(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		token, err := tokenFromRequest(r)
@@ -432,8 +500,25 @@ func tokenFromRequest(r *http.Request) (string, error) {
 	if token, err := zitadel.ExtractBearerToken(r.Header.Get("Authorization")); err == nil {
 		return token, nil
 	}
+	if websocket.IsWebSocketUpgrade(r) {
+		if token, ok := tokenFromWebSocketSubprotocols(r); ok {
+			return token, nil
+		}
+	}
 
 	return "", fmt.Errorf("missing bearer token")
+}
+
+func tokenFromWebSocketSubprotocols(r *http.Request) (string, bool) {
+	for _, protocol := range websocket.Subprotocols(r) {
+		if strings.HasPrefix(protocol, webSocketBearerPrefix) {
+			token := strings.TrimPrefix(protocol, webSocketBearerPrefix)
+			if token != "" {
+				return token, true
+			}
+		}
+	}
+	return "", false
 }
 
 func (s *Server) registerClient(client *wsClient) {
