@@ -44,7 +44,7 @@ Before deployment, have all of the following:
 - reachable Postgres DSN for the shared Sift database;
 - reachable Zitadel issuer URL;
 - Zitadel audience for the API application;
-- one allowed browser origin if WebSocket is used from a browser UI;
+- one allowed browser origin if REST or WebSocket is used from a browser UI;
 - repo checkout path `/srv/sift/current`.
 
 ## Expected Host Layout
@@ -107,13 +107,14 @@ Recommended variables:
 - `SIFTD_SYNC_TIMEOUT=4m`
 - `SIFTD_RETENTION=720h`
 - `SIFTD_SYNC_ON_START=true`
-- `SIFTD_WS_ALLOWED_ORIGINS=https://console.example.com`
+- `SIFTD_ALLOWED_ORIGINS=https://skill7.dev`
 
 Operational notes:
 
 - `SIFTD_RETENTION=720h` means `30d`.
 - `SIFTD_SYNC_TIMEOUT` must stay below `SIFTD_SYNC_INTERVAL`.
-- if `SIFTD_WS_ALLOWED_ORIGINS` is set, browser clients must send one of those origins;
+- if `SIFTD_ALLOWED_ORIGINS` is set, browser REST requests and browser WebSocket clients must send one of those origins;
+- `SIFTD_WS_ALLOWED_ORIGINS` is still accepted as a legacy fallback alias for older deployments;
 - keep `SIFTD_ADDR` bound to localhost unless TLS termination is handled directly in-process.
 
 ## Start and Verify
@@ -205,6 +206,13 @@ If `/readyz` stays degraded:
 
 If browser WebSocket connection fails:
 
-- confirm the client uses `Authorization: Bearer <token>`;
-- confirm request `Origin` matches `SIFTD_WS_ALLOWED_ORIGINS`;
+- confirm browser clients send `Sec-WebSocket-Protocol: sift.v1, bearer.<token>`;
+- confirm non-browser clients use `Authorization: Bearer <token>` if they do not support subprotocol auth;
+- confirm request `Origin` matches `SIFTD_ALLOWED_ORIGINS`;
 - confirm the reverse proxy forwards the WebSocket upgrade headers unchanged.
+
+If browser REST requests fail with CORS errors:
+
+- confirm `SIFTD_ALLOWED_ORIGINS` includes the browser origin exactly;
+- confirm the browser is calling the public HTTPS hostname rather than the pod or cluster IP;
+- confirm the reverse proxy preserves the `Origin` header unchanged.

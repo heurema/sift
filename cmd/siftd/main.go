@@ -27,17 +27,17 @@ const (
 )
 
 type config struct {
-	ListenAddr       string
-	PostgresDSN      string
-	RegistryPath     string
-	OutputDir        string
-	SyncInterval     time.Duration
-	SyncTimeout      time.Duration
-	RetentionWindow  time.Duration
-	SyncOnStart      bool
-	ZitadelIssuer    string
-	ZitadelAudience  string
-	WSAllowedOrigins []string
+	ListenAddr      string
+	PostgresDSN     string
+	RegistryPath    string
+	OutputDir       string
+	SyncInterval    time.Duration
+	SyncTimeout     time.Duration
+	RetentionWindow time.Duration
+	SyncOnStart     bool
+	ZitadelIssuer   string
+	ZitadelAudience string
+	AllowedOrigins  []string
 }
 
 func main() {
@@ -68,11 +68,11 @@ func run(ctx context.Context) error {
 	}
 
 	api, err := hosted.New(hosted.Options{
-		Store:                   store,
-		Validator:               validator,
-		OutputDir:               cfg.OutputDir,
-		AllowedWebSocketOrigins: cfg.WSAllowedOrigins,
-		Now:                     func() time.Time { return time.Now().UTC() },
+		Store:                 store,
+		Validator:             validator,
+		OutputDir:             cfg.OutputDir,
+		AllowedBrowserOrigins: cfg.AllowedOrigins,
+		Now:                   func() time.Time { return time.Now().UTC() },
 	})
 	if err != nil {
 		return err
@@ -190,18 +190,23 @@ func loadConfigFromEnv() (config, error) {
 		return config{}, err
 	}
 
+	allowedOrigins := parseCSVEnv("SIFTD_ALLOWED_ORIGINS")
+	if len(allowedOrigins) == 0 {
+		allowedOrigins = parseCSVEnv("SIFTD_WS_ALLOWED_ORIGINS")
+	}
+
 	cfg := config{
-		ListenAddr:       envOrDefault("SIFTD_ADDR", defaultListenAddr),
-		PostgresDSN:      strings.TrimSpace(os.Getenv("SIFTD_POSTGRES_DSN")),
-		RegistryPath:     envOrDefault("SIFTD_REGISTRY", defaultRegistryPath),
-		OutputDir:        envOrDefault("SIFTD_OUTPUT_DIR", defaultOutputDir),
-		SyncInterval:     syncInterval,
-		SyncTimeout:      syncTimeout,
-		RetentionWindow:  retentionWindow,
-		SyncOnStart:      syncOnStart,
-		ZitadelIssuer:    strings.TrimSpace(os.Getenv("SIFTD_ZITADEL_ISSUER")),
-		ZitadelAudience:  strings.TrimSpace(os.Getenv("SIFTD_ZITADEL_AUDIENCE")),
-		WSAllowedOrigins: parseCSVEnv("SIFTD_WS_ALLOWED_ORIGINS"),
+		ListenAddr:      envOrDefault("SIFTD_ADDR", defaultListenAddr),
+		PostgresDSN:     strings.TrimSpace(os.Getenv("SIFTD_POSTGRES_DSN")),
+		RegistryPath:    envOrDefault("SIFTD_REGISTRY", defaultRegistryPath),
+		OutputDir:       envOrDefault("SIFTD_OUTPUT_DIR", defaultOutputDir),
+		SyncInterval:    syncInterval,
+		SyncTimeout:     syncTimeout,
+		RetentionWindow: retentionWindow,
+		SyncOnStart:     syncOnStart,
+		ZitadelIssuer:   strings.TrimSpace(os.Getenv("SIFTD_ZITADEL_ISSUER")),
+		ZitadelAudience: strings.TrimSpace(os.Getenv("SIFTD_ZITADEL_AUDIENCE")),
+		AllowedOrigins:  allowedOrigins,
 	}
 
 	if cfg.PostgresDSN == "" {
