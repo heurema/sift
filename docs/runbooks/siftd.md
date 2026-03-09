@@ -97,6 +97,8 @@ Required variables:
 - `SIFTD_POSTGRES_DSN`
 - `SIFTD_ZITADEL_ISSUER`
 - `SIFTD_ZITADEL_AUDIENCE`
+  Set this to the raw Zitadel project ID that appears in the access token `aud`
+  claim, not to the `urn:zitadel:iam:org:project:id:<PROJECT_ID>:aud` scope string.
 
 Recommended variables:
 
