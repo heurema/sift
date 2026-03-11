@@ -91,12 +91,25 @@ Every source added to the registry must declare:
 
 - `source_id`
 - `source_name`
-- `source_type`
+- `source_class` (`media` or `official`)
 - `access_method`
-- `terms_url` if available
+- `url`
+- `source_weight`
 - `rights_mode`
-- `notes`
+- `excerpt_allowed`
+- `summary_allowed`
+- `default_editorial_type`
 - `reviewed_at`
+- `notes`
+
+The canonical field list is enforced by the source loader (`DisallowUnknownFields`).
+See `docs/contracts/source-registry.seed.json` for the reference shape.
+
+### Naming boundary
+
+Sources carry `rights_mode` to describe the ingestion permission level.
+Events carry `rights.storage_mode` to describe the storage outcome after ingestion.
+Both use the same enum values (`metadata_only`, `metadata_plus_excerpt`, `metadata_plus_summary`, `full_text_allowed`), but `rights_mode` is a source-level input and `storage_mode` is an event-level derived output.
 
 ## Output rules
 

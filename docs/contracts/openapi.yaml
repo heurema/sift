@@ -16,10 +16,31 @@ servers:
 security:
   - ZitadelOIDC: []
 paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      summary: Health check
+      security: []
+      responses:
+        "200":
+          description: Service is running
+  /readyz:
+    get:
+      operationId: readinessCheck
+      summary: Readiness check
+      security: []
+      responses:
+        "200":
+          description: Service is ready to accept traffic
+        "503":
+          description: Service is not ready
   /v1/events:
     get:
       operationId: listEvents
       summary: List events
+      description: |
+        Cursor-based pagination is defined but not yet implemented.
+        Passing a non-empty `cursor` value returns `400`.
       parameters:
         - name: category
           in: query
@@ -42,6 +63,10 @@ paths:
           in: query
           schema:
             type: string
+            enum:
+              - single_source
+              - multi_source_verified
+              - official_source_confirmed
         - name: since
           in: query
           schema:
@@ -49,6 +74,7 @@ paths:
             format: date-time
         - name: cursor
           in: query
+          description: Reserved for future pagination. Not implemented; any non-empty value returns 400.
           schema:
             type: string
         - name: limit
@@ -74,6 +100,12 @@ paths:
                   next_cursor:
                     type: string
                     nullable: true
+        "400":
+          description: Invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         "401":
           description: Missing or invalid bearer token
   /v1/events/{event_id}:
@@ -149,6 +181,11 @@ paths:
         Non-browser clients may authenticate with `Authorization: Bearer <token>`.
         Browser clients should use `Sec-WebSocket-Protocol: sift.v1, bearer.<token>`
         so the server can validate the bearer token without exposing it in the URL.
+
+        Frame types sent by the server:
+        - `{"type": "connected"}` — initial handshake acknowledgement
+        - `{"type": "event.upserted", "event_id": "..."}` — an event was created or updated
+        - `{"type": "digest.updated", "scope": "...", "window": "..."}` — a digest was regenerated
       responses:
         "101":
           description: Switching protocols to WebSocket
@@ -160,9 +197,17 @@ components:
       type: openIdConnect
       openIdConnectUrl: https://auth.10g.dev/.well-known/openid-configuration
   schemas:
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
     Event:
       type: object
-      description: See docs/contracts/event.schema.json for canonical detail.
+      description: |
+        See docs/contracts/event.schema.json for the canonical JSON Schema.
+        This OpenAPI definition mirrors the canonical schema for tooling compatibility.
       required:
         - event_id
         - category
@@ -170,6 +215,9 @@ components:
         - event_type
         - title
         - summary_1l
+        - assets
+        - topics
+        - entities
         - published_at
         - updated_at
         - first_seen_at
@@ -182,20 +230,29 @@ components:
       properties:
         event_id:
           type: string
+          pattern: "^evt_[a-z0-9_]+$"
         category:
           type: string
+          enum: [crypto]
         status:
           type: string
+          enum:
+            - single_source
+            - multi_source_verified
+            - official_source_confirmed
         event_type:
           type: string
         title:
           type: string
+          minLength: 1
         summary_1l:
           type: string
+          minLength: 1
         summary_5l:
           type: array
           items:
             type: string
+          maxItems: 5
         assets:
           type: array
           items:
@@ -204,6 +261,10 @@ components:
           type: array
           items:
             type: string
+        entities:
+          type: array
+          items:
+            $ref: "#/components/schemas/Entity"
         published_at:
           type: string
           format: date-time
@@ -218,13 +279,82 @@ components:
           format: date-time
         importance_score:
           type: number
+          minimum: 0
+          maximum: 1
+        market_relevance_score:
+          type: number
+          minimum: 0
+          maximum: 1
         confidence_score:
           type: number
+          minimum: 0
+          maximum: 1
         source_cluster_size:
           type: integer
+          minimum: 1
         supporting_articles:
           type: array
           items:
-            type: object
+            $ref: "#/components/schemas/SupportingArticle"
+          minItems: 1
         rights:
-          type: object
+          $ref: "#/components/schemas/Rights"
+        markdown_url:
+          type: string
+    Entity:
+      type: object
+      required: [type, id, name]
+      properties:
+        type:
+          type: string
+          enum:
+            - asset
+            - protocol
+            - exchange
+            - regulator
+            - person
+            - company
+            - region
+        id:
+          type: string
+        name:
+          type: string
+    SupportingArticle:
+      type: object
+      required: [article_id, source, url, published_at, editorial_type]
+      properties:
+        article_id:
+          type: string
+        source:
+          type: string
+        url:
+          type: string
+          format: uri
+        published_at:
+          type: string
+          format: date-time
+        editorial_type:
+          type: string
+          enum:
+            - report
+            - analysis
+            - opinion
+            - press_release
+            - sponsored
+            - rumor
+            - official_announcement
+    Rights:
+      type: object
+      required: [storage_mode, full_text_stored, excerpt_allowed]
+      properties:
+        storage_mode:
+          type: string
+          enum:
+            - metadata_only
+            - metadata_plus_excerpt
+            - metadata_plus_summary
+            - full_text_allowed
+        full_text_stored:
+          type: boolean
+        excerpt_allowed:
+          type: boolean
