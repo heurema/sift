@@ -1,15 +1,18 @@
-# Sift
+```
+         _ ______
+   _____(_) __/ /_
+  / ___/ / /_/ __/
+ (__  ) / __/ /_
+/____/_/_/  \__/
+```
 
-> Signal over noise for humans and agents.
+**Signal over noise for humans and agents.**
 
-Sift is a docs-first project for a crypto news system that serves both people and AI agents.
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-The core idea is simple:
+> Crypto news system serving both people and AI agents. JSON as canonical truth, Markdown as projection.
 
-- humans need a fast, deduplicated workspace with filters and digest views;
-- agents need typed event records, provenance, stable IDs, and compact Markdown context;
-- the system should treat `JSON` as the canonical truth and `Markdown` as a projection for reading and handoff.
-- local agents should be able to work through a simple `CLI` without needing MCP.
+---
 
 ## Why this exists
 
